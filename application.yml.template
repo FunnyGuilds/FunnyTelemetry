@@ -1,0 +1,35 @@
+funnytelemetry:
+  main: 'http://funnytelemetry.dzikoysk.net'
+
+server:
+  port: 80
+
+spring:
+  datasource:
+    driverClassName: 'com.mysql.cj.jdbc.Driver'
+    url: jdbc:mysql://localhost:3306/funnytelemetry?serverTimezone=UTC
+    username: funnytelemetry
+    password:
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+github:
+  client-id: xxx
+  client-secret: xxx
+
+security:
+  oauth2:
+    client:
+      clientId: xxx
+      clientSecret: xxx
+      accessTokenUri: https://github.com/login/oauth/access_token
+      userAuthorizationUri: https://github.com/login/oauth/authorize
+      tokenName: access_token
+      authenticationScheme: query
+      clientAuthenticationScheme: form
+      scope: 'read:user'
+    resource:
+      userInfoUri: https://api.github.com/user
