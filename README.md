@@ -18,5 +18,6 @@ Telemetry & more for the glorious, best, totally-rpg [FunnyGuilds](https://githu
 This project:
 - may or may not work,
 - may or may not contain gluten,
+- may or may not contain traces of nuts,
 - may or may not randomly injure people in a 15 meter radius, and
-- may or may not be safe for children under the age of 12.
+- may or may not be safe for children under the age of 12
