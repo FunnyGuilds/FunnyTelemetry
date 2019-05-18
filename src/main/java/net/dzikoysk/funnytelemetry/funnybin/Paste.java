@@ -20,15 +20,19 @@ public class Paste extends EntityWithUniqueId
     @Column(nullable = false, columnDefinition = "VARCHAR(15)")
     private String submitter;
 
+    @Column(nullable = false, unique = true, columnDefinition = "CHAR(8)")
+    private String shortLink;
+
     public Paste()
     {
     }
 
-    public Paste(final UUID uniqueId, final String content, final String submitter)
+    public Paste(final UUID uniqueId, final String content, final String submitter, final String shortLink)
     {
         super(uniqueId);
         this.content = content;
         this.submitter = submitter;
+        this.shortLink = shortLink;
     }
 
     public String getContent()
@@ -49,5 +53,15 @@ public class Paste extends EntityWithUniqueId
     public void setSubmitter(final String submitter)
     {
         this.submitter = submitter;
+    }
+
+    public String getShortLink()
+    {
+        return this.shortLink;
+    }
+
+    public void setShortLink(final String shortLink)
+    {
+        this.shortLink = shortLink;
     }
 }

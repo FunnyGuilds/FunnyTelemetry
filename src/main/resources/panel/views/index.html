@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <th:block th:replace="template/libraries :: head"/>
+
+        <title>Funny Telemetry</title>
+    </head>
+    <body>
+        <div class="jumbotron text-center">
+            <h1>Funny Telemetry</h1>
+            <p>Very funny telemetry, hahahaha, lol.</p>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-4">
+                    <h3>What is it?</h3>
+                    <p>This is a panel for developers of <a href="https://github.com/FunnyGuilds/FunnyGuilds">FunnyGuilds</a> plugin.</p>
+                    <p> You can see the source code of this project <a href="https://github.com/FunnyGuilds/FunnyTelemetry">Here</a></p>
+                </div>
+                <div class="col-sm-4">
+                    <h3>What do I do here?</h3>
+                    <p sec:authorize="!hasRole('USER')">Nothing. <a href="https://google.com">Go away</a>. Shoosh.</p>
+                    <p sec:authorize="hasRole('USER')">Everything. <a th:href="@{/panel/}">Go in</a>. Welcome.</p>
+
+                </div>
+                <div class="col-sm-4">
+                    <h3>I am a very funny developer.</h3>
+
+                    <a sec:authorize="!isAuthenticated()" th:href="@{/login}">
+                        Login with GitHub
+                    </a>
+
+                    <th:block sec:authorize="isAuthenticated()" th:href="@{/login}">
+                        <p>You are logged in as: <span sec:authentication="name" class="logged-as"/> ... </p>
+
+                        <p sec:authorize="!hasRole('USER')">... but you are not funny at all :(</p>
+                        <p sec:authorize="hasRole('USER')"><a th:href="@{/panel/}">This way, please.</a></p>
+
+                        <form action="/logout" method="post">
+                            <input class="btn btn-info" type="submit" value="Log out">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                        </form>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

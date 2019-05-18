@@ -2,6 +2,7 @@ package net.dzikoysk.funnytelemetry.commons;
 
 import java.util.Objects;
 import java.util.UUID;
+import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,6 +18,7 @@ public class EntityWithUniqueId
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+    @Column(unique = true, columnDefinition = "BINARY(16)")
     private UUID uniqueId = UUID.randomUUID();
 
     public EntityWithUniqueId()

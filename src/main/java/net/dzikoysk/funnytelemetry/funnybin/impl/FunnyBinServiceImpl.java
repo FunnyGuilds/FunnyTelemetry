@@ -29,7 +29,7 @@ public class FunnyBinServiceImpl implements FunnyBinService
     public Paste submitPaste(final String content, final String submitterIp)
     {
         // TODO bans
-        final Paste paste = new Paste(UUID.randomUUID(), content, submitterIp);
+        final Paste paste = new Paste(UUID.randomUUID(), content, submitterIp, ""); // TODO: Short link
         this.funnyRepository.save(paste);
         return paste;
     }

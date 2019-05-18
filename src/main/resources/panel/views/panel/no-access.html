@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <th:block th:replace="template/libraries :: head"/>
+
+        <title>What do you think are you doing? >:(</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="error-body">
+                        <h1>
+                            Oops!</h1>
+                        <h2>
+                            403 Forbidden
+                        </h2>
+                        <img th:src="@{/resources/img/403.jpg}" alt="very powerful kamilkime logo">
+                        <p>
+                            No permissions, <a th:href="@{/}">go away</a>, or we will capture you and force you to watch all Kamilkime youtube videos.
+                        </p>
+                        <p>
+                            We know who you are <span sec:authentication="name"/> , and where do you live.
+                        </p>
+                        <p>
+                            Glory to FunnyTelemetry. Glory to FunnyGuilds. Glory to Panda.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

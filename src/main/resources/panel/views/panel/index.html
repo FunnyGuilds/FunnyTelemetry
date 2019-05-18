@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>FunnyTelemetry - Panel</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                </ol>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-chart-area"></i>
+                        No siema to jest jakas karta</div>
+                       <div class="card-body">
+
+                        <p>
+                            No siema, telemetria powstaje.
+                        </p>
+
+                        <p>
+                            Zalogowales sie jako: <span sec:authentication="name"/> :0
+                        </p>
+
+                        <p>
+                            Organizacje do ktorych nalezysz:
+                        </p>
+
+                        <p>
+                            Role:
+                        </p>
+
+                        <ul th:each="role : ${#authentication.authorities}">
+                            <li th:text="${role.getAuthority()}"/>
+                        </ul>
+                    </div>
+                    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                </div>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

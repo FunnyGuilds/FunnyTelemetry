@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>FunnyTelemetry - Panel</title>
+</head>
+<body>
+<p th:if="${error}" th:text="${error}"/>
+
+Very secret setup page:
+
+<form method="post">
+    <label>
+        Setup password:
+        <input name="setup_password" type="password">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+    </label>
+
+    <input type="submit">
+</form>
+</body>
+</html>

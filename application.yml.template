@@ -1,5 +1,6 @@
 funnytelemetry:
   main: 'http://funnytelemetry.dzikoysk.net'
+  setup-password: ''
 
 server:
   port: 80
@@ -11,10 +12,8 @@ spring:
     username: funnytelemetry
     password:
   jpa:
-    generate-ddl: true
-    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
 github:
   client-id: xxx

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <th:block th:replace="template/libraries :: head"/>
+
+        <title>404 =(</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="error-body">
+                        <h1>
+                            Oops!</h1>
+                        <h2>
+                            404 Not found
+                        </h2>
+                        <img th:src="@{/resources/img/404.jpeg}" alt="very sad panda">
+                        <p>
+                            The requested URL<span th:if="${requestedUrl}" th:text="' \'' + ${requestedUrl} + '\''"/> was not found.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>
