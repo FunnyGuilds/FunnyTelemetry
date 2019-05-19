@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <head>
-        <meta charset="UTF-8">
-    </head>
     <body>
+        <!--/*@thymesVar id="tab" type="java.lang.String"*/-->
+
         <nav th:fragment="navigation" class="navbar navbar-expand navbar-dark bg-dark static-top">
             <a class="navbar-brand mr-1" href="index.html">FunnyTelemetry Panel</a>
-
-            <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
-                <i class="fas fa-bars"></i>
-            </button>
 
             <div class="ml-auto"></div>
 
@@ -23,7 +18,7 @@
                         <span sec:authentication="name"/>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" th:href="@{/panel/my-logs}">My logs</a>
+                        <a class="dropdown-item" th:href="@{/panel/logs/mine}">My logs</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item logout logout-button" href="#">Logout</a>
                     </div>
@@ -33,33 +28,91 @@
 
         <ul th:fragment="sidebar" class="sidebar navbar-nav">
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/panel/}" th:classappend="${#request.getRequestURI() == '/panel/'} ? 'active'">
+                <a class="nav-link" th:href="@{/panel/}" th:classappend="${tab == 'dashboard'} ? 'active'">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/panel/funnypaste}" th:classappend="${#request.getRequestURI() == '/panel/funnypaste'} ? 'active'">
+                <a class="nav-link" th:href="@{/panel/funnybin/pastes/}" th:classappend="${tab == 'funnybin'} ? 'active'">
                     <i class="fas fa-fw fa-paste"></i>
-                    <span>FunnyPaste</span></a>
+                    <span>FunnyBin</span>
+                </a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/panel/logs}" th:classappend="${#request.getRequestURI() == '/panel/logs'} ? 'active'">
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/panel/logs/}" th:classappend="${tab == 'logs'} ? 'active'">
                     <i class="fas fa-fw fa-file-alt"></i>
-                    <span>Logs</span></a>
+                    <span>Logs</span>
+                </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/panel/access}" th:classappend="${#request.getRequestURI() == '/panel/access'} ? 'active'">
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/panel/access/}" th:classappend="${tab == 'access'} ? 'active'">
                     <i class="fas fa-fw fa-key"></i>
-                    <span>Access</span></a>
+                    <span>Access</span>
+                </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link" th:href="@{/panel/bans}" th:classappend="${#request.getRequestURI() == '/panel/bans'} ? 'active'">
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" th:href="@{/panel/bans/}" th:classappend="${tab == 'bans'} ? 'active'">
                     <i class="fas fa-fw fa-ban"></i>
-                    <span>Bans</span></a>
+                    <span>Bans</span>
+                </a>
             </li>
         </ul>
+
+        <!--/*@thymesVar id="page" type="org.springframework.data.domain.Page<>"*/-->
+        <nav th:fragment="pagination" class="pagination-container container-fluid">
+            <div class="row">
+                <div class="col-sm-3">
+                            <span>
+                                Showing <span th:text="${page.getNumberOfElements()}"/> of out <span th:text="${page.getTotalElements()}"/>
+                                elements in page <span th:text="${page.getNumber() + 1}"/>/<span th:text="${page.getTotalPages()}"/>
+                            </span>
+                </div>
+                <div class="col-sm-6">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${page.isFirst()} ? 'disabled'">
+                            <a class="page-link" th:href="'?page=1&size=' + ${page.getSize()}">First</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled'">
+                            <a class="page-link" th:href="'?page=' + ${page.getNumber()} + '&size=' + ${page.getSize()}">Previous</a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(page.getNumber() - 2, page.getNumber())} " th:if="${i} >= 1">
+                            <a class="page-link" th:href="'?page=' + ${i} + '&size=' + ${page.getSize()}" th:text="${i}"/>
+                        </li>
+
+                        <li class="page-item active">
+                            <a class="page-link" href="#" th:text="${page.getNumber() + 1}"/>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(page.getNumber() + 2, page.getNumber() + 4)} " th:if="${i} <= ${page.getTotalPages()}">
+                            <a class="page-link" th:href="'?page=' + ${i} + '&size=' + ${page.getSize()}" th:text="${i}"/>
+                        </li>
+
+                        <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled'">
+                            <a class="page-link" th:href="'?page=' + ${page.getNumber() + 2} + '&size=' + ${page.getSize()}">Next</a>
+                        </li>
+
+                        <li class="page-item" th:classappend="${page.isLast()} ? 'disabled'">
+                            <a class="page-link" th:href="'?page=' + ${page.getTotalPages()} + '&size=' + ${page.getSize()}">Last</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-3 pagination-select">
+                    <span>Items per page: </span>&nbsp;
+                    <!--suppress HtmlFormInputWithoutLabel -->
+                    <select class="form-control">
+                        <option>5</option>
+                        <option selected>10</option>
+                        <option>20</option>
+                        <option>50</option>
+                        <option>100</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
     </body>
 </html>

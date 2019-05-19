@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>FunnyTelemetry - FunnyBin - Paste list</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <!--/*@thymesVar id="shortLinkService" type="net.dzikoysk.funnytelemetry.shortlink.ShortLinkService"*/-->
+        <!--/*@thymesVar id="paste" type="net.dzikoysk.funnytelemetry.funnybin.Paste"*/-->
+        <!--/*@thymesVar id="error" type="boolean"*/-->
+        <!--/*@thymesVar id="justHidden" type="boolean"*/-->
+
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/pastes}">FunnyBin</a>
+                    </li>
+                    <li class="breadcrumb-item active">Paste: <span th:text="${error} ? 'unknown' : ${paste.uniqueId}"/></li>
+                </ol>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    Paste with given id was not found. <a href="javascript:window.history.back()">Go back</a>
+                </div>
+
+                <div th:if="!${error} and ${paste.hide}" class="alert alert-warning" role="alert">
+                    This paste is hidden.
+                </div>
+
+                <div th:if="${justHidden}" class="alert alert-success" role="alert">
+                    Paste hidden succesfully. <a href="javascript:window.history.back()">Go back</a>
+                </div>
+
+                <div th:if="!${error}">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-paste"></i> Paste content (<a th:href="@{/panel/funnybin/paste/{id}/raw(id=${paste.uniqueId})}">See raw</a>)
+
+                            <th:block th:if="!${paste.hide}">
+                                <span sec:authorize="hasRole('ADMIN')">
+                                    (<a data-confirmation="Are you sure you want to hide this paste? (This cannot be undone)" class="confirmation-link" th:href="@{/panel/funnybin/paste/{id}/hide(id=${paste.uniqueId})}">Hide this paste.</a>)
+                                </span>
+                            </th:block>
+                        </div>
+                        <div class="card-body">
+                            <code th:text="${paste.content}"/>
+                        </div>
+                        <div class="card-footer small text-muted">
+                            Uploaded at <span th:text="${#dates.format(paste.submitDate, 'dd-MM-yyyy HH:mm:ss')}"/> by
+                            <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${paste.submitter}" data-hidden="1">Hidden (click to show)</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

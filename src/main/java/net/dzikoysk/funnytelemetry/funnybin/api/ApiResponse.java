@@ -2,24 +2,36 @@ package net.dzikoysk.funnytelemetry.funnybin.api;
 
 public class ApiResponse
 {
-    private String url;
+    private String fullUrl;
+    private String shortUrl;
 
     public ApiResponse()
     {
     }
 
-    public ApiResponse(String url)
+    public ApiResponse(final String fullUrl, final String shortUrl)
     {
-        this.url = url;
+        this.fullUrl = fullUrl;
+        this.shortUrl = shortUrl;
     }
 
-    public String getUrl()
+    public String getFullUrl()
     {
-        return this.url;
+        return this.fullUrl;
     }
 
-    public void setUrl(String url)
+    public void setFullUrl(final String fullUrl)
     {
-        this.url = url;
+        this.fullUrl = fullUrl;
+    }
+
+    public String getShortUrl()
+    {
+        return this.shortUrl;
+    }
+
+    public void setShortUrl(final String shortUrl)
+    {
+        this.shortUrl = shortUrl;
     }
 }

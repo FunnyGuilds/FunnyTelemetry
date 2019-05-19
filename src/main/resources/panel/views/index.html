@@ -16,7 +16,7 @@
                 <div class="col-sm-4">
                     <h3>What is it?</h3>
                     <p>This is a panel for developers of <a href="https://github.com/FunnyGuilds/FunnyGuilds">FunnyGuilds</a> plugin.</p>
-                    <p> You can see the source code of this project <a href="https://github.com/FunnyGuilds/FunnyTelemetry">Here</a></p>
+                    <p> You can see the source code of this project <a href="https://github.com/FunnyGuilds/FunnyTelemetry">here</a></p>
                 </div>
                 <div class="col-sm-4">
                     <h3>What do I do here?</h3>
@@ -32,9 +32,9 @@
                     </a>
 
                     <th:block sec:authorize="isAuthenticated()" th:href="@{/login}">
-                        <p>You are logged in as: <span sec:authentication="name" class="logged-as"/> ... </p>
+                        <p>You are logged in as: <span sec:authentication="name" class="logged-as"/></p>
 
-                        <p sec:authorize="!hasRole('USER')">... but you are not funny at all :(</p>
+                        <p sec:authorize="!hasRole('USER')"> ... but you are not funny at all :(</p>
                         <p sec:authorize="hasRole('USER')"><a th:href="@{/panel/}">This way, please.</a></p>
 
                         <form action="/logout" method="post">

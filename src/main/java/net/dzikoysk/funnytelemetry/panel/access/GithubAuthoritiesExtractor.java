@@ -1,6 +1,7 @@
 package net.dzikoysk.funnytelemetry.panel.access;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,7 +37,17 @@ public class GithubAuthoritiesExtractor implements AuthoritiesExtractor
         final String login = (String) map.get("login");
         LOGGER.info("Getting authorities for {}", login);
 
-        final Collection<String> organizations = this.githubApiService.getUsersOrganizations(login);
+        Collection<String> organizations;
+        try
+        {
+            organizations = this.githubApiService.getUsersOrganizations(login);
+        }
+        catch (final IllegalArgumentException e)
+        {
+            LOGGER.warn("Failed to get authorities for " + login, e);
+            organizations = Collections.emptyList();
+        }
+
         final AccessLevel access = this.panelAccessService.getAccessForUserOrOrganizations(login, organizations);
 
         return access.getRoles()

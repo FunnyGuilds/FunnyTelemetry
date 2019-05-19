@@ -60,3 +60,47 @@
 .logout-form {
     display: none;
 }
+
+.table-effects > tr:hover {
+    background-color: rgba(0, 0, 0, .075);
+    -webkit-transition: background-color 0.25s;
+    -moz-transition: background-color 0.25s;
+    -o-transition: background-color 0.25s;
+    transition: background-color 0.25s;
+}
+
+.pagination-container {
+    margin-bottom: 30px;
+}
+
+.pagination-container > .row > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination {
+    margin: 0;
+}
+
+.pagination-select {
+    display: flex;
+    justify-content: space-between;
+}
+
+.pagination-select > span {
+    flex: 1 2 300px;
+}
+
+.pagination-select > select {
+    flex: 2 1 auto;
+}
+
+code {
+    display: block;
+    white-space: pre-wrap
+}
+
+.hidden-paste {
+    color: #ff0000;
+}

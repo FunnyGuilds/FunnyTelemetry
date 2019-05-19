@@ -15,7 +15,7 @@ import javax.persistence.MappedSuperclass;
 public class EntityWithUniqueId
 {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(unique = true, columnDefinition = "BINARY(16)")

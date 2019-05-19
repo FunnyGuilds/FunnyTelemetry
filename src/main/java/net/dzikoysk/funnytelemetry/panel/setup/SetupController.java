@@ -23,7 +23,7 @@ public class SetupController
     @RequestMapping(value = "/setup", method = RequestMethod.GET)
     public String setup()
     {
-        if (!this.setupService.isSetupAvailable())
+        if (! this.setupService.isSetupAvailable())
         {
             return "redirect:/";
         }
@@ -34,7 +34,7 @@ public class SetupController
     @RequestMapping(value = "/setup", method = RequestMethod.POST)
     public String setup(@RequestParam("setup_password") final String password, final Principal principal, final RedirectAttributes redirectAttributes)
     {
-        if (!this.setupService.validatePassword(password))
+        if (! this.setupService.validatePassword(password))
         {
             redirectAttributes.addFlashAttribute("error", "Invalid setup password");
             return "redirect:/setup";

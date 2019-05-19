@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>FunnyTelemetry - Panel</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                not implemented xd
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>
