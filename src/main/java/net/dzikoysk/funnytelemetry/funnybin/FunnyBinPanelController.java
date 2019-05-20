@@ -1,11 +1,14 @@
 package net.dzikoysk.funnytelemetry.funnybin;
 
+import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import net.dzikoysk.funnytelemetry.funnybin.exception.PasteNotFoundException;
 import net.dzikoysk.funnytelemetry.funnybin.shortlink.FunnyBinShortLinkService;
+import net.dzikoysk.funnytelemetry.panel.logs.ActionType;
+import net.dzikoysk.funnytelemetry.panel.logs.LogService;
 import net.dzikoysk.funnytelemetry.shortlink.ShortLinkService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,11 +26,13 @@ public class FunnyBinPanelController
 {
     private final PasteService             pasteService;
     private final FunnyBinShortLinkService shortLinkService;
+    private final LogService               logService;
 
-    public FunnyBinPanelController(final PasteService pasteService, final FunnyBinShortLinkService shortLinkService)
+    public FunnyBinPanelController(final PasteService pasteService, final FunnyBinShortLinkService shortLinkService, final LogService logService)
     {
         this.pasteService = pasteService;
         this.shortLinkService = shortLinkService;
+        this.logService = logService;
     }
 
     @RequestMapping("/pastes")
@@ -68,13 +73,14 @@ public class FunnyBinPanelController
     }
 
     @RequestMapping("/paste/{pasteId}/hide")
-    public String pasteHide(final Model model, @PathVariable("pasteId") final String pasteId, final HttpServletRequest request)
+    public String pasteHide(final Model model, @PathVariable("pasteId") final String pasteId, final HttpServletRequest request, final Principal principal)
     {
         final Optional<Paste> paste = this.pasteService.findPaste(UUID.fromString(pasteId));
 
         if (paste.isPresent())
         {
             this.pasteService.hide(paste.get());
+            this.logService.submitLog(ActionType.HIDE_PASTE, paste.get().getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
 
             model.addAttribute("paste", paste.get());
             model.addAttribute("justHidden", true);

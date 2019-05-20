@@ -14,7 +14,7 @@ import net.dzikoysk.funnytelemetry.panel.AccessLevel;
 @Table(name = "funnytelemetry_panel_access")
 public class PanelAccess extends EntityWithUniqueId
 {
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     public String name;
 
     @Column(columnDefinition = "VARCHAR(16)", nullable = false)

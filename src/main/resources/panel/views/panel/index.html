@@ -30,22 +30,14 @@
                         </p>
 
                         <p>
-                            Zalogowales sie jako: <span sec:authentication="name"/> :0
+                            Zalogowałeś się jako: <span sec:authentication="name"/> :0
                         </p>
 
                         <p>
-                            Organizacje do ktorych nalezysz:
+                            Tutaj będą wielkie rzeczy. Soon&trade;
                         </p>
-
-                        <p>
-                            Role:
-                        </p>
-
-                        <ul th:each="role : ${#authentication.authorities}">
-                            <li th:text="${role.getAuthority()}"/>
-                        </ul>
                     </div>
-                    <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+                    <div class="card-footer small text-muted">Updated today at <th:block th:text="${#dates.format(#dates.createNow(), 'hh:mm a')}"/> </div>
                 </div>
             </div>
         </div>

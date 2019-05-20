@@ -62,26 +62,27 @@
         </ul>
 
         <!--/*@thymesVar id="page" type="org.springframework.data.domain.Page<>"*/-->
+        <!--/*@thymesVar id="filter" type="java.lang.String"*/-->
         <nav th:fragment="pagination" class="pagination-container container-fluid">
             <div class="row">
                 <div class="col-sm-3">
-                            <span>
-                                Showing <span th:text="${page.getNumberOfElements()}"/> of out <span th:text="${page.getTotalElements()}"/>
-                                elements in page <span th:text="${page.getNumber() + 1}"/>/<span th:text="${page.getTotalPages()}"/>
-                            </span>
+                    <span>
+                        Showing <span th:text="${page.getNumberOfElements()}"/> of out <span th:text="${page.getTotalElements()}"/>
+                        elements in page <span th:text="${page.getNumber() + 1}"/>/<span th:text="${page.getTotalPages()}"/>
+                    </span>
                 </div>
                 <div class="col-sm-6">
                     <ul class="pagination justify-content-center">
                         <li class="page-item" th:classappend="${page.isFirst()} ? 'disabled'">
-                            <a class="page-link" th:href="'?page=1&size=' + ${page.getSize()}">First</a>
+                            <a class="page-link" th:href="'?page=1&size=' + ${page.getSize()} + '&filter=' + ${filter}">First</a>
                         </li>
 
                         <li class="page-item" th:classappend="${!page.hasPrevious()} ? 'disabled'">
-                            <a class="page-link" th:href="'?page=' + ${page.getNumber()} + '&size=' + ${page.getSize()}">Previous</a>
+                            <a class="page-link" th:href="'?page=' + ${page.getNumber()} + '&size=' + ${page.getSize()} + '&filter=' + ${filter}">Previous</a>
                         </li>
 
                         <li class="page-item" th:each="i : ${#numbers.sequence(page.getNumber() - 2, page.getNumber())} " th:if="${i} >= 1">
-                            <a class="page-link" th:href="'?page=' + ${i} + '&size=' + ${page.getSize()}" th:text="${i}"/>
+                            <a class="page-link" th:href="'?page=' + ${i} + '&size=' + ${page.getSize()} + '&filter=' + ${filter}" th:text="${i}"/>
                         </li>
 
                         <li class="page-item active">
@@ -89,15 +90,15 @@
                         </li>
 
                         <li class="page-item" th:each="i : ${#numbers.sequence(page.getNumber() + 2, page.getNumber() + 4)} " th:if="${i} <= ${page.getTotalPages()}">
-                            <a class="page-link" th:href="'?page=' + ${i} + '&size=' + ${page.getSize()}" th:text="${i}"/>
+                            <a class="page-link" th:href="'?page=' + ${i} + '&size=' + ${page.getSize()} + '&filter=' + ${filter}" th:text="${i}"/>
                         </li>
 
                         <li class="page-item" th:classappend="${!page.hasNext()} ? 'disabled'">
-                            <a class="page-link" th:href="'?page=' + ${page.getNumber() + 2} + '&size=' + ${page.getSize()}">Next</a>
+                            <a class="page-link" th:href="'?page=' + ${page.getNumber() + 2} + '&size=' + ${page.getSize()} + '&filter=' + ${filter}">Next</a>
                         </li>
 
                         <li class="page-item" th:classappend="${page.isLast()} ? 'disabled'">
-                            <a class="page-link" th:href="'?page=' + ${page.getTotalPages()} + '&size=' + ${page.getSize()}">Last</a>
+                            <a class="page-link" th:href="'?page=' + ${page.getTotalPages()} + '&size=' + ${page.getSize()} + '&filter=' + ${filter}">Last</a>
                         </li>
                     </ul>
                 </div>

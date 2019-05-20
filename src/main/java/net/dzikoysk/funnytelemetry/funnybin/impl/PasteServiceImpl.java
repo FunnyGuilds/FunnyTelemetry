@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import net.dzikoysk.funnytelemetry.funnybin.Paste;
-import net.dzikoysk.funnytelemetry.funnybin.PasteRepository;
 import net.dzikoysk.funnytelemetry.funnybin.PasteService;
 import net.dzikoysk.funnytelemetry.funnybin.shortlink.FunnyBinShortLinkService;
 import org.springframework.data.domain.Page;

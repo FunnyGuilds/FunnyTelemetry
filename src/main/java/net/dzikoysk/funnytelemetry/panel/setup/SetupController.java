@@ -2,6 +2,10 @@ package net.dzikoysk.funnytelemetry.panel.setup;
 
 import java.security.Principal;
 
+import javax.servlet.http.HttpServletRequest;
+
+import net.dzikoysk.funnytelemetry.panel.logs.ActionType;
+import net.dzikoysk.funnytelemetry.panel.logs.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,11 +17,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class SetupController
 {
     private final SetupService setupService;
+    private final LogService   logService;
 
     @Autowired
-    public SetupController(final SetupService setupService)
+    public SetupController(final SetupService setupService, final LogService logService)
     {
         this.setupService = setupService;
+        this.logService = logService;
     }
 
     @RequestMapping(value = "/setup", method = RequestMethod.GET)
@@ -32,7 +38,7 @@ public class SetupController
     }
 
     @RequestMapping(value = "/setup", method = RequestMethod.POST)
-    public String setup(@RequestParam("setup_password") final String password, final Principal principal, final RedirectAttributes redirectAttributes)
+    public String setup(@RequestParam("setup_password") final String password, final Principal principal, final RedirectAttributes redirectAttributes, final HttpServletRequest request)
     {
         if (! this.setupService.validatePassword(password))
         {
@@ -41,6 +47,8 @@ public class SetupController
         }
 
         this.setupService.setupUser(principal);
+        this.logService.submitLog(ActionType.USED_SETUP, null, principal.getName(), request.getRemoteAddr());
+
         return "redirect:/";
     }
 }

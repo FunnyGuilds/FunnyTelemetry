@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>FunnyTelemetry - Logs</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <nav th:replace="panel/template :: navigation"/>
+        <!--/*@thymesVar id="filter" type="java.lang.String"*/-->
+        <!--/*@thymesVar id="lockUser" type="boolean"*/-->
+        <!--/*@thymesVar id="filterIp" type="java.lang.String"*/-->
+        <!--/*@thymesVar id="filterUser" type="java.lang.String"*/-->
+        <!--/*@thymesVar id="logs" type="org.springframework.data.domain.Page<net.dzikoysk.funnytelemetry.panel.logs.Log>"*/-->
+        <!--/*@thymesVar id="logService" type="net.dzikoysk.funnytelemetry.panel.logs.LogService"*/-->
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+                    <li class="breadcrumb-item active">Logs</li>
+                </ol>
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="width: 10%;" scope="col">Id</th>
+                            <th style="width: 15%;" scope="col">Type</th>
+                            <th style="width: 15%;" scope="col">Who</th>
+                            <th style="width: 30%;" scope="col">Details</th>
+                            <th style="width: 15%;" scope="col">Date</th>
+                            <th style="width: 20%;" scope="col">IP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--/*@thymesVar id="element" type="net.dzikoysk.funnytelemetry.panel.logs.Log"*/-->
+                        <tr class="table-effects" th:each="element : ${logs.getContent()}">
+
+                            <th scope="row" th:text="'#' + ${element.id}"/>
+                            <td th:text="${element.actionType.text}" />
+                            <td th:text="${element.user}" />
+                            <td th:utext="${logService.resolveLogDetails(element.actionType, element.details)}" />
+
+                            <td th:text="${#dates.format(element.date, 'dd-MM-yyyy HH:mm:ss')}"/>
+                            <td>
+                                <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${element.ip}" data-hidden="1">Hidden (click to show)</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <nav th:replace="panel/template :: pagination(page=${logs})"/>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

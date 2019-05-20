@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 
 import net.dzikoysk.funnytelemetry.panel.AccessLevel;
 import net.dzikoysk.funnytelemetry.panel.access.PanelAccess;
-import net.dzikoysk.funnytelemetry.panel.access.PanelAccessRepository;
 import net.dzikoysk.funnytelemetry.panel.access.PanelAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,5 +107,55 @@ public class PanelAccessServiceImpl implements PanelAccessService
         final List<PanelAccess> accessList = this.panelAccessRepository.findByNameIn(allIds);
 
         return accessList.stream().map(PanelAccess::getAccessLevel).max(Comparator.naturalOrder()).orElse(AccessLevel.NO_ACCESS);
+    }
+
+    @Override
+    public Map<String, AccessLevel> getAccessLevelForUsers()
+    {
+        return this.getAccessLevel(false);
+    }
+
+    @Override
+    public Map<String, AccessLevel> getAccessLevelForOrganizations()
+    {
+        return this.getAccessLevel(true);
+    }
+
+    private Map<String, AccessLevel> getAccessLevel(final boolean organization)
+    {
+        final List<PanelAccess> access = organization ? this.panelAccessRepository.findByNameLike("@%") : this.panelAccessRepository.findByNameNotLike("@%");
+
+        return access
+            .stream()
+            .filter(a -> a.getAccessLevel() != AccessLevel.NO_ACCESS)
+            .collect(Collectors.toMap(a -> organization ? a.getName().substring(1) : a.getName(), PanelAccess::getAccessLevel));
+    }
+
+    @Override
+    @Transactional
+    public void reorganizeAccess(final Map<String, AccessLevel> userAccess, final Map<String, AccessLevel> organizationAccess)
+    {
+        final Collection<PanelAccess> access = new ArrayList<>(userAccess.size() + organizationAccess.size());
+        userAccess.forEach((key, value) -> access.add(new PanelAccess(UUID.randomUUID(), key, value)));
+        organizationAccess.forEach((key, value) -> access.add(new PanelAccess(UUID.randomUUID(), "@" + key, value)));
+
+        for (final String name : userAccess.keySet())
+        {
+            if (! NAME_PATTERN.matcher(name).matches())
+            {
+                throw new IllegalArgumentException("name is invalid");
+            }
+        }
+        for (final String name : organizationAccess.keySet())
+        {
+            if (! NAME_PATTERN.matcher(name).matches())
+            {
+                throw new IllegalArgumentException("name is invalid");
+            }
+        }
+
+        this.panelAccessRepository.deleteAll();
+        this.panelAccessRepository.findAll(); // this has to be here or the next query will crash, dont expect me to know how it works xd
+        this.panelAccessRepository.saveAll(access);
     }
 }

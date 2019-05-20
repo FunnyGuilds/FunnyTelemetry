@@ -24,6 +24,9 @@
                     <li class="breadcrumb-item">
                         <a th:href="@{/panel/funnybin/pastes}">FunnyBin</a>
                     </li>
+                    <li th:if="${paste.hide}" class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/pastes/hidden}">Hidden entries</a>
+                    </li>
                     <li class="breadcrumb-item active">Paste: <span th:text="${error} ? 'unknown' : ${paste.uniqueId}"/></li>
                 </ol>
 

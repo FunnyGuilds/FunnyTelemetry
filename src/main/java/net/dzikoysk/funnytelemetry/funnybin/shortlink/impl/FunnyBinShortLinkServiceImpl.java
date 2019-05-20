@@ -2,7 +2,7 @@ package net.dzikoysk.funnytelemetry.funnybin.shortlink.impl;
 
 import java.util.Optional;
 
-import net.dzikoysk.funnytelemetry.funnybin.PasteRepository;
+import net.dzikoysk.funnytelemetry.funnybin.impl.PasteRepository;
 import net.dzikoysk.funnytelemetry.funnybin.shortlink.FunnyBinShortLinkService;
 import net.dzikoysk.funnytelemetry.shortlink.impl.ShortLinkServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

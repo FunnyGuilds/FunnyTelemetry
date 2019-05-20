@@ -1,9 +1,10 @@
-package net.dzikoysk.funnytelemetry.funnybin;
+package net.dzikoysk.funnytelemetry.funnybin.impl;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import net.dzikoysk.funnytelemetry.funnybin.Paste;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

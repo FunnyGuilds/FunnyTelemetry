@@ -47,9 +47,9 @@
                             <th sec:authorize="hasRole('ADMIN')" style="width: 5%;" scope="col">Hide</th>
                         </tr>
                     </thead>
-                    <tbody class="table-effects">
+                    <tbody>
                         <!--/*@thymesVar id="element" type="net.dzikoysk.funnytelemetry.funnybin.Paste"*/-->
-                        <tr th:each="element : ${page.getContent()}" th:classappend="${element.hide} ? 'table-danger'">
+                        <tr class="table-effects" th:each="element : ${page.getContent()}" th:classappend="${element.hide} ? 'table-danger'">
 
                             <th scope="row" th:text="'#' + ${element.id}"/>
                             <td>
@@ -74,7 +74,7 @@
                     </tbody>
                 </table>
 
-                <nav th:replace="panel/template :: pagination(page=${page})"/>
+                <nav th:replace="panel/template :: pagination(page=${page}, filter='none')"/>
             </div>
         </div>
 

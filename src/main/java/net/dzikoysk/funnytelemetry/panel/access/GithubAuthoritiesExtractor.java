@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import net.dzikoysk.funnytelemetry.github.GithubApiService;
 import net.dzikoysk.funnytelemetry.panel.AccessLevel;
+import net.dzikoysk.funnytelemetry.panel.logs.ActionType;
+import net.dzikoysk.funnytelemetry.panel.logs.LogService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,6 @@ public class GithubAuthoritiesExtractor implements AuthoritiesExtractor
     public List<GrantedAuthority> extractAuthorities(final Map<String, Object> map)
     {
         final String login = (String) map.get("login");
-        LOGGER.info("Getting authorities for {}", login);
 
         Collection<String> organizations;
         try

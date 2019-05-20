@@ -61,7 +61,7 @@
     display: none;
 }
 
-.table-effects > tr:hover {
+.table-effects {
     background-color: rgba(0, 0, 0, .075);
     -webkit-transition: background-color 0.25s;
     -moz-transition: background-color 0.25s;
@@ -103,4 +103,8 @@ code {
 
 .hidden-paste {
     color: #ff0000;
+}
+
+.hidden {
+    display: none;
 }

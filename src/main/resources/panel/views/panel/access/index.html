@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>FunnyTelemetry - Access</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <!--/*@thymesVar id="access_users" type="java.util.Map<java.lang.string, net.dzikoysk.funnytelemetry.panel.access.PanelAccess>"*/-->
+        <!--/*@thymesVar id="access_organizations" type="java.util.Map<java.lang.string, net.dzikoysk.funnytelemetry.panel.access.PanelAccess>"*/-->
+        <!--/*@thymesVar id="success" type="boolean"*/-->
+
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+                    <li class="breadcrumb-item active">Access</li>
+                </ol>
+
+                <div th:if="${success}" class="alert alert-success" role="alert">
+                    Saved successfully
+                </div>
+
+                <div class="hidden">
+                    <div class="template-select">
+                        <!--suppress HtmlFormInputWithoutLabel -->
+                        <select class="form-control">
+                            <option>User</option>
+                            <option>Admin</option>
+                        </select>
+                    </div>
+                    <div class="template-delete">
+                        <button class="btn btn-danger btn-delete-access">Delete</button>
+                    </div>
+                </div>
+
+                <h3>
+                    Organizations that have access to the telemetry.
+                    <button class="btn btn-success btn-add-access" data-target=".table-access-org" data-prompt="Please type the organization name">Add new</button>
+                </h3>
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="width: 60%;" scope="col">Organization name</th>
+                            <th style="width: 40%;" scope="col">Access level</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-effects table-access-org">
+                        <tr th:each="entry : ${access_organizations.entrySet()}">
+                            <td th:text="${entry.key}"/>
+                            <td>
+                                <!--suppress HtmlFormInputWithoutLabel -->
+                                <select class="form-control">
+                                    <option th:selected="${entry.value.toString().equals('USER_ACCESS')}">User</option>
+                                    <option th:selected="${entry.value.toString().equals('ADMIN_ACCESS')}">Admin</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger btn-delete-access">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>
+                    Users who have access to the telemetry.
+                    <button class="btn btn-success btn-add-access" data-target=".table-access-users" data-prompt="Please type the Github username">Add new</button>
+                </h3>
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="width: 60%;" scope="col">Username</th>
+                            <th style="width: 40%;" scope="col">Access level</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-effects table-access-users">
+                        <tr th:each="entry : ${access_users.entrySet()}">
+                            <td th:text="${entry.key}"/>
+                            <td>
+                                <!--suppress HtmlFormInputWithoutLabel -->
+                                <select class="form-control">
+                                    <option th:selected="${entry.value.toString().equals('USER_ACCESS')}">User</option>
+                                    <option th:selected="${entry.value.toString().equals('ADMIN_ACCESS')}">Admin</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="btn btn-danger btn-delete-access">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <button class="btn btn-success btn-block btn-save-access">Save (this will logout all users because why not)</button>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>
