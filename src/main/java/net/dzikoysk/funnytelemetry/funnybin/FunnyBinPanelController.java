@@ -4,11 +4,13 @@ import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 
 import net.dzikoysk.funnytelemetry.funnybin.exception.PasteNotFoundException;
-import net.dzikoysk.funnytelemetry.funnybin.shortlink.FunnyBinShortLinkService;
-import net.dzikoysk.funnytelemetry.panel.logs.ActionType;
-import net.dzikoysk.funnytelemetry.panel.logs.LogService;
+import net.dzikoysk.funnytelemetry.funnybin.shortlink.FunnyBinBundleShortLinkService;
+import net.dzikoysk.funnytelemetry.funnybin.shortlink.FunnyBinPasteShortLinkService;
+import net.dzikoysk.funnytelemetry.logs.ActionType;
+import net.dzikoysk.funnytelemetry.logs.LogService;
 import net.dzikoysk.funnytelemetry.shortlink.ShortLinkService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,15 +26,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/panel/funnybin/")
 public class FunnyBinPanelController
 {
-    private final PasteService             pasteService;
-    private final FunnyBinShortLinkService shortLinkService;
-    private final LogService               logService;
+    private final PasteService                   pasteService;
+    private final FunnyBinPasteShortLinkService  pasteShortLinkService;
+    private final FunnyBinBundleShortLinkService bundleShortLinkService;
+    private final LogService                     logService;
 
-    public FunnyBinPanelController(final PasteService pasteService, final FunnyBinShortLinkService shortLinkService, final LogService logService)
+    public FunnyBinPanelController(final PasteService pasteService, final FunnyBinPasteShortLinkService pasteShortLinkService, final FunnyBinBundleShortLinkService bundleShortLinkService,
+                                   final LogService logService)
     {
         this.pasteService = pasteService;
-        this.shortLinkService = shortLinkService;
+        this.pasteShortLinkService = pasteShortLinkService;
+        this.bundleShortLinkService = bundleShortLinkService;
         this.logService = logService;
+    }
+
+    @RequestMapping("/")
+    public String index()
+    {
+        return "panel/funnybin/index";
     }
 
     @RequestMapping("/pastes")
@@ -79,8 +90,11 @@ public class FunnyBinPanelController
 
         if (paste.isPresent())
         {
-            this.pasteService.hide(paste.get());
-            this.logService.submitLog(ActionType.HIDE_PASTE, paste.get().getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
+            if (! paste.get().isHide())
+            {
+                this.pasteService.hide(paste.get());
+                this.logService.submitLog(ActionType.HID_PASTE, paste.get().getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
+            }
 
             model.addAttribute("paste", paste.get());
             model.addAttribute("justHidden", true);
@@ -107,15 +121,91 @@ public class FunnyBinPanelController
         return paste.get().getContent();
     }
 
+    @RequestMapping("/bundles")
+    public String bundles(final Model model, @PageableDefault final Pageable pageable)
+    {
+        return this.bundles(model, false, pageable);
+    }
+
+    @RequestMapping("/bundles/hidden")
+    public String bundlesHidden(final Model model, @PageableDefault final Pageable pageable)
+    {
+        return this.bundles(model, true, pageable);
+    }
+
+    public String bundles(final Model model, final boolean hidden, final Pageable pageable)
+    {
+        final Page<PasteBundle> page = hidden ? this.pasteService.getBundlesHidden(pageable) : this.pasteService.getBundles(pageable);
+        model.addAttribute("page", page);
+        model.addAttribute("hidden", hidden);
+        return "panel/funnybin/bundle-list";
+    }
+
+    @RequestMapping("/bundle/{bundleId}")
+    public String bundle(final Model model, @PathVariable("bundleId") final String bundleId, final HttpServletRequest request)
+    {
+        final Optional<PasteBundle> bundle = this.pasteService.findBundle(UUID.fromString(bundleId));
+
+        if (bundle.isPresent() && (request.isUserInRole("ADMIN") || ! bundle.get().isHide()))
+        {
+            model.addAttribute("bundle", bundle.get());
+        }
+        else
+        {
+            model.addAttribute("error", true);
+        }
+
+        return "panel/funnybin/bundle";
+    }
+
+    @RequestMapping("/bundle/{bundleId}/hide")
+    @Transactional
+    public String bundleHide(final Model model, @PathVariable("bundleId") final String bundleId, final HttpServletRequest request, final Principal principal)
+    {
+        final Optional<PasteBundle> bundle = this.pasteService.findBundle(UUID.fromString(bundleId));
+
+        if (bundle.isPresent())
+        {
+            if (! bundle.get().isHide())
+            {
+                for (final Paste paste : bundle.get().getPastes())
+                {
+                    if (! paste.isHide())
+                    {
+                        this.logService.submitLog(ActionType.HID_PASTE, paste.getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
+                    }
+                }
+                this.logService.submitLog(ActionType.HID_PASTE_BUNDLE, bundle.get().getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
+            }
+
+            this.pasteService.hide(bundle.get());
+
+            model.addAttribute("bundle", bundle.get());
+            model.addAttribute("justHidden", true);
+        }
+        else
+        {
+            model.addAttribute("error", true);
+        }
+
+        return "panel/funnybin/bundle";
+    }
+
     @ModelAttribute("tab")
     public String attributeTab()
     {
         return "funnybin";
     }
 
-    @ModelAttribute("shortLinkService")
+    @ModelAttribute("pasteShortLinkService")
     public ShortLinkService attributeShortLinkService()
     {
-        return this.shortLinkService;
+        return this.pasteShortLinkService;
+    }
+
+    @ModelAttribute("bundleShortLinkService")
+    public ShortLinkService attributeBundleShortLinkService()
+    {
+        return this.bundleShortLinkService;
     }
 }

@@ -3,6 +3,8 @@ package net.dzikoysk.funnytelemetry.config;
 import java.util.List;
 import javax.servlet.Filter;
 
+import net.dzikoysk.funnytelemetry.ratelimit.RateLimitService;
+import net.dzikoysk.funnytelemetry.ratelimit.RateLimiterHeaderFilter;
 import net.dzikoysk.funnytelemetry.shortlink.ShortLinkHandlerInterceptor;
 import net.dzikoysk.funnytelemetry.shortlink.ShortLinkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 public class WebMvcConfiguration extends WebMvcConfigurationSupport
 {
     private final ApplicationContext applicationContext;
+    private final RateLimitService   rateLimitService;
 
     @Value("${funnytelemetry.debug.resources_root:}")
     private String resourcesRoot;
@@ -35,9 +38,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport
     private String templatesRoot;
 
     @Autowired
-    public WebMvcConfiguration(final ApplicationContext applicationContext)
+    public WebMvcConfiguration(final ApplicationContext applicationContext, final RateLimitService rateLimitService)
     {
         this.applicationContext = applicationContext;
+        this.rateLimitService = rateLimitService;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport
     }
 
     @Bean
-    public FilterRegistrationBean securityFilterChain(@Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) final Filter securityFilter)
+    public FilterRegistrationBean<Filter> securityFilterChain(@Qualifier(AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME) final Filter securityFilter)
     {
         final FilterRegistrationBean<Filter> registration = new FilterRegistrationBean<>(securityFilter);
         registration.setOrder(Integer.MAX_VALUE - 1);
@@ -68,7 +72,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport
     }
 
     @Bean
-    public FilterRegistrationBean shortLinkHandlerInterceptor()
+    public FilterRegistrationBean<ShortLinkHandlerInterceptor> shortLinkHandlerInterceptor()
     {
         final FilterRegistrationBean<ShortLinkHandlerInterceptor> registrationBean = new FilterRegistrationBean<>();
         final ShortLinkHandlerInterceptor userFilter = new ShortLinkHandlerInterceptor(this.applicationContext.getBeansOfType(ShortLinkService.class).values());
@@ -78,9 +82,15 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport
     }
 
     @Bean
+    public FilterRegistrationBean<RateLimiterHeaderFilter> rateLimitHeaderFilter()
+    {
+        return new FilterRegistrationBean<>(new RateLimiterHeaderFilter(this.rateLimitService));
+    }
+
+    @Bean
     public SpringResourceTemplateResolver templateResolver()
     {
-        final var templateResolver = new SpringResourceTemplateResolver();
+        final SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(this.applicationContext);
         templateResolver.setPrefix(this.templatesRoot.isEmpty() ? "classpath:/panel/views/" : this.templatesRoot);
         templateResolver.setSuffix(".html");
@@ -92,7 +102,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport
     @Bean
     public SpringTemplateEngine templateEngine()
     {
-        final var templateEngine = new SpringTemplateEngine();
+        final SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(this.templateResolver());
         templateEngine.setEnableSpringELCompiler(true);
         templateEngine.addDialect(new SpringSecurityDialect());

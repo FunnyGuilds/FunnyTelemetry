@@ -5,9 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
-import net.dzikoysk.funnytelemetry.panel.AccessLevel;
-import net.dzikoysk.funnytelemetry.panel.logs.ActionType;
-import net.dzikoysk.funnytelemetry.panel.logs.LogService;
+import net.dzikoysk.funnytelemetry.logs.ActionType;
+import net.dzikoysk.funnytelemetry.logs.LogService;
 import net.dzikoysk.funnytelemetry.session.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -74,7 +73,7 @@ public class AccessController
         }
 
         this.panelAccessService.reorganizeAccess(userAccess, organizationAccess);
-        this.logService.submitLog(ActionType.CHANGE_ACCESS, log.toString(), principal.getName(), request.getRemoteAddr());
+        this.logService.submitLog(ActionType.CHANGED_ACCESS, log.toString(), principal.getName(), request.getRemoteAddr());
         this.sessionService.invalidateAllRoles();
         redirectAttributes.addFlashAttribute("success", true);
         return "redirect:/panel/access/";

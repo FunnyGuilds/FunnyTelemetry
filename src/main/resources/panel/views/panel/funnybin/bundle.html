@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>FunnyTelemetry - FunnyBin - Paste list</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <!--/*@thymesVar id="bundleShortLinkService" type="net.dzikoysk.funnytelemetry.shortlink.ShortLinkService"*/-->
+        <!--/*@thymesVar id="bundle" type="net.dzikoysk.funnytelemetry.funnybin.PasteBundle"*/-->
+        <!--/*@thymesVar id="error" type="boolean"*/-->
+        <!--/*@thymesVar id="justHidden" type="boolean"*/-->
+
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/}">FunnyBin</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/bundles}">Bundles</a>
+                    </li>
+                    <li th:if="!${error} and ${bundle.hide}" class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/bundles/hidden}">Hidden entries</a>
+                    </li>
+                    <li class="breadcrumb-item active">Bundle: <span th:text="${error} ? 'unknown' : ${bundle.uniqueId}"/></li>
+                </ol>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    Bundle with given id was not found. <a href="javascript:window.history.back()">Go back</a>
+                </div>
+
+                <div th:if="!${error} and ${bundle.hide}" class="alert alert-warning" role="alert">
+                    This bundle is hidden.
+                </div>
+
+                <div th:if="${justHidden}" class="alert alert-success" role="alert">
+                    Bundle hidden succesfully. <a href="javascript:window.history.back()">Go back</a>
+                </div>
+
+                <th:block th:if="!${error}">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-file-archive"></i>
+                            &nbsp;Bundle
+                            <th:block th:if="!${bundle.hide}">
+                                <span sec:authorize="hasRole('ADMIN')">
+                                    (<a data-confirmation="Are you sure you want to hide this bundle? (This cannot be undone)" class="confirmation-link" th:href="@{/panel/funnybin/bundle/{id}/hide(id=${bundle.uniqueId})}">Hide this bundle</a>)
+                                </span>
+                            </th:block>
+                        </div>
+                        <div class="card-body">
+                            This bundle consists of following pastes:
+
+                            <ul>
+                                <li th:each="paste : ${bundle.pastes}">
+                                    <th:block th:if="${paste.hide}">
+                                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/panel/funnybin/paste/{id}(id=${paste.uniqueId})}" th:text="${paste.uniqueId}" />
+                                        <b>Hidden paste</b>
+                                    </th:block>
+
+                                    <th:block th:if="!${paste.hide}">
+                                        <a th:href="@{/panel/funnybin/paste/{id}(id=${paste.uniqueId})}" th:text="${paste.uniqueId}" />
+
+                                        <span th:text="${paste.pasteType.name}" class="badge badge-success"/>
+                                        <span th:text="${paste.tag}" class="badge badge-primary"/>
+                                    </th:block>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="card-footer small text-muted">
+                            Submitted at <span th:text="${#dates.format(bundle.submitDate, 'dd-MM-yyyy HH:mm:ss')}"/> by
+                            <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${bundle.submitter}" data-hidden="1">Hidden (click to show)</a>
+                        </div>
+                    </div>
+                </th:block>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

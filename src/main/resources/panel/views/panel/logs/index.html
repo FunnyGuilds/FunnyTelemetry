@@ -11,8 +11,8 @@
         <!--/*@thymesVar id="lockUser" type="boolean"*/-->
         <!--/*@thymesVar id="filterIp" type="java.lang.String"*/-->
         <!--/*@thymesVar id="filterUser" type="java.lang.String"*/-->
-        <!--/*@thymesVar id="logs" type="org.springframework.data.domain.Page<net.dzikoysk.funnytelemetry.panel.logs.Log>"*/-->
-        <!--/*@thymesVar id="logService" type="net.dzikoysk.funnytelemetry.panel.logs.LogService"*/-->
+        <!--/*@thymesVar id="logs" type="org.springframework.data.domain.Page<net.dzikoysk.funnytelemetry.logs.Log>"*/-->
+        <!--/*@thymesVar id="logService" type="net.dzikoysk.funnytelemetry.logs.LogService"*/-->
 
         <div class="wrapper">
             <ul th:replace="panel/template :: sidebar"/>
@@ -22,7 +22,11 @@
                     <li class="breadcrumb-item">
                         <a th:href="@{/panel/}">FunnyTelemetry</a>
                     </li>
-                    <li class="breadcrumb-item active">Logs</li>
+                    <li th:if="${lockUser}" class="breadcrumb-item">
+                        <a th:href="@{/panel/logs/}">Logs</a>
+                    </li>
+                    <li th:if="${lockUser}" class="breadcrumb-item active">Mine</li>
+                    <li th:if="!${lockUser}" class="breadcrumb-item active">Logs</li>
                 </ol>
 
                 <table class="table">
@@ -33,11 +37,11 @@
                             <th style="width: 15%;" scope="col">Who</th>
                             <th style="width: 30%;" scope="col">Details</th>
                             <th style="width: 15%;" scope="col">Date</th>
-                            <th style="width: 20%;" scope="col">IP</th>
+                            <th style="width: 20%;" scope="col">IP <a class="toggle-ips" href="javascript:void(0)">Toggle all</a></th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!--/*@thymesVar id="element" type="net.dzikoysk.funnytelemetry.panel.logs.Log"*/-->
+                        <!--/*@thymesVar id="element" type="net.dzikoysk.funnytelemetry.logs.Log"*/-->
                         <tr class="table-effects" th:each="element : ${logs.getContent()}">
 
                             <th scope="row" th:text="'#' + ${element.id}"/>

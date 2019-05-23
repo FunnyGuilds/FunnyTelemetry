@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 
-import net.dzikoysk.funnytelemetry.panel.AccessLevel;
+import net.dzikoysk.funnytelemetry.panel.access.AccessLevel;
 import net.dzikoysk.funnytelemetry.panel.access.PanelAccess;
 import net.dzikoysk.funnytelemetry.panel.access.PanelAccessService;
 import org.springframework.beans.factory.annotation.Autowired;

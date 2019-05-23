@@ -1,9 +1,14 @@
 package net.dzikoysk.funnytelemetry.funnybin;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -14,7 +19,7 @@ import net.dzikoysk.funnytelemetry.commons.EntityWithUniqueId;
  * Represents a FunnyBin's paste
  */
 @Entity
-@Table(name = "funnybin_pastes")
+@Table(name = "funnytelemetry_funnybin_pastes")
 public class Paste extends EntityWithUniqueId
 {
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -33,11 +38,21 @@ public class Paste extends EntityWithUniqueId
     @Column(nullable = false)
     private boolean hide = false;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PasteType pasteType;
+
+    @Column(nullable = false, columnDefinition = "VARCHAR(255)")
+    private String tag;
+
+    @ManyToMany(mappedBy = "pastes", fetch = FetchType.EAGER)
+    public List<PasteBundle> pasteBundles;
+
     public Paste()
     {
     }
 
-    public Paste(final UUID uniqueId, final String content, final String submitter, final Date submitDate, final String shortLink, final boolean hide)
+    public Paste(final UUID uniqueId, final String content, final String submitter, final Date submitDate, final String shortLink, final boolean hide, final PasteType pasteType, final String tag, final List<PasteBundle> pasteBundles)
     {
         super(uniqueId);
         this.content = content;
@@ -45,6 +60,9 @@ public class Paste extends EntityWithUniqueId
         this.submitDate = submitDate;
         this.shortLink = shortLink;
         this.hide = hide;
+        this.pasteType = pasteType;
+        this.tag = tag;
+        this.pasteBundles = pasteBundles;
     }
 
     public String getContent()
@@ -95,5 +113,35 @@ public class Paste extends EntityWithUniqueId
     public void setHide(final boolean hide)
     {
         this.hide = hide;
+    }
+
+    public PasteType getPasteType()
+    {
+        return this.pasteType;
+    }
+
+    public void setPasteType(final PasteType pasteType)
+    {
+        this.pasteType = pasteType;
+    }
+
+    public String getTag()
+    {
+        return this.tag;
+    }
+
+    public void setTag(final String tag)
+    {
+        this.tag = tag;
+    }
+
+    public List<PasteBundle> getPasteBundles()
+    {
+        return this.pasteBundles;
+    }
+
+    public void setPasteBundles(final List<PasteBundle> pasteBundles)
+    {
+        this.pasteBundles = pasteBundles;
     }
 }

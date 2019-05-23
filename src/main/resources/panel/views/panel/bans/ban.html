@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>FunnyTelemetry - FunnyBin - Paste list</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <!--/*@thymesVar id="ban" type="net.dzikoysk.funnytelemetry.ban.Ban"*/-->
+        <!--/*@thymesVar id="revokeForm" type="net.dzikoysk.funnytelemetry.panel.bans.RevokeForm"*/-->
+        <!--/*@thymesVar id="error" type="boolean"*/-->
+        <!--/*@thymesVar id="justAdded" type="boolean"*/-->
+
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/bans/}">Bans</a>
+                    </li>
+                    <li class="breadcrumb-item active">Ban: <span th:text="${error} ? 'unknown' : ${ban.uniqueId}"/></li>
+                </ol>
+
+                <div th:if="${error}" class="alert alert-danger" role="alert">
+                    Ban with the given id was not found. <a href="javascript:window.history.back()">Go back</a>
+                </div>
+
+                <div th:if="${justAdded}" class="alert alert-success" role="alert">
+                    Ban added succesfully. <a href="javascript:window.history.back()">Go back</a>
+                </div>
+
+                <div th:if="!${error}">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <i class="fas fa-fw fa-ban"></i>
+                            Ban information for <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${ban.ip}" data-hidden="1">Hidden (click to show)</a>
+                        </div>
+                        <div class="card-body">
+                            <code th:text="${ban.reason}"/>
+                        </div>
+                        <div class="card-footer small text-muted">
+                            Banned at <span th:text="${#dates.format(ban.date, 'dd-MM-yyyy HH:mm:ss')}"/> by
+                            <span th:text="${ban.issuer}"/>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3" th:if="!${ban.revoked}">
+                        <div class="card-header">
+                            <i class="fas fa-fw fa-unlock"></i>
+                            Revoke this ban
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/panel/bans/{id}/revoke(id=${ban.uniqueId})}" th:object="${revokeForm}" method="post">
+                                <div class="form-group">
+                                    <label for="banReason">Reason</label>
+                                    <textarea class="form-control" id="banReason" th:field="*{reason}" placeholder="Reason..." rows="5"></textarea>
+                                </div>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <button type="submit" class="btn btn-success btn-block">Revoke</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div th:if="${ban.revoked}" class="alert alert-warning" role="alert">
+                        This ban is revoked.
+                    </div>
+
+                    <div class="card mb-3" th:if="${ban.revoked}">
+                        <div class="card-header">
+                            <i class="fas fa-fw fa-ban"></i>
+                            This ban was revoked.
+                        </div>
+                        <div class="card-body">
+                            <code th:text="${ban.revocationReason}"/>
+                        </div>
+                        <div class="card-footer small text-muted">
+                            Revoked at <span th:text="${#dates.format(ban.revocationDate, 'dd-MM-yyyy HH:mm:ss')}"/> by
+                            <span th:text="${ban.revokedBy}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

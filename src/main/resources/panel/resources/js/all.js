@@ -17,6 +17,10 @@ $(function () {
         }
     });
 
+    $(".toggle-ips").click(function () {
+        $(".hidden-ip").click();
+    });
+
     var urlParams = new URLSearchParams(window.location.search);
     // noinspection EqualityComparisonWithCoercionJS
     var size = urlParams.get("size") == undefined ? 10 : parseInt(urlParams.get("size"));

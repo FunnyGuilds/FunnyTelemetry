@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>FunnyTelemetry - Logs</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <nav th:replace="panel/template :: navigation"/>
+        <!--/*@thymesVar id="bans" type="org.springframework.data.domain.Page<net.dzikoysk.funnytelemetry.ban.Ban>"*/-->
+        <!--/*@thymesVar id="showRevoked" type="boolean"*/-->
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+                    <li th:if="${showRevoked}" class="breadcrumb-item">
+                        <a th:href="@{/panel/bans/}">Bans</a>
+                    </li>
+                    <li th:if="${showRevoked}" class="breadcrumb-item active">All</li>
+                    <li th:if="!${showRevoked}" class="breadcrumb-item active">
+                        Bans
+                        &nbsp;(Currently omitting revoked bans, click <a th:href="@{/panel/bans/all}">here</a> to show them)
+                    </li>
+                </ol>
+
+                <h3>
+                    Ban list
+                    <a th:href="@{/panel/bans/add}">
+                        <button class="btn btn-warning">
+                            Add new ban
+                        </button>
+                    </a>
+                </h3>
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="width: 10%;" scope="col">Id</th>
+                            <th style="width: 20%;" scope="col">IP Address <a class="toggle-ips" href="javascript:void(0)">Toggle all</a></th>
+                            <th style="width: 30%;" scope="col">Reason</th>
+                            <th style="width: 15%;" scope="col">Issuer</th>
+                            <th style="width: 15%;" scope="col">Date</th>
+                            <th style="width: 10%;" scope="col">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--/*@thymesVar id="element" type="net.dzikoysk.funnytelemetry.ban.Ban"*/-->
+                        <tr class="table-effects" th:each="element : ${bans.getContent()}" th:classappend="${element.revoked} ? 'table-danger'">
+                            <th scope="row">
+                                <span th:text="'#' + ${element.id}"/>
+                                <span th:if="${element.revoked}" class="hidden-paste">Revoked</span>
+                            </th>
+                            <td>
+                                <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${element.ip}" data-hidden="1">Hidden (click to show)</a>
+                            </td>
+                            <td th:text="${element.reasonShort}"/>
+                            <td th:text="${element.issuer}"/>
+                            <td th:text="${#dates.format(element.date, 'dd-MM-yyyy HH:mm:ss')}"/>
+                            <td>
+                                <a th:href="@{/panel/bans/{id}(id=${element.uniqueId})}">
+                                    <button class="btn btn-info btn-block">
+                                        Details
+                                    </button>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <nav th:replace="panel/template :: pagination(page=${bans})"/>
+            </div>
+
+            <th:block th:replace="template/libraries :: body"/>
+        </div>
+    </body>
+</html>

@@ -8,7 +8,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 import net.dzikoysk.funnytelemetry.commons.EntityWithUniqueId;
-import net.dzikoysk.funnytelemetry.panel.AccessLevel;
 
 @Entity
 @Table(name = "funnytelemetry_panel_access")

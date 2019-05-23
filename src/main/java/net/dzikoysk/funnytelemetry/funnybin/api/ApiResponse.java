@@ -4,15 +4,17 @@ public class ApiResponse
 {
     private String fullUrl;
     private String shortUrl;
+    private String uuid;
 
     public ApiResponse()
     {
     }
 
-    public ApiResponse(final String fullUrl, final String shortUrl)
+    public ApiResponse(final String fullUrl, final String shortUrl, final String uuid)
     {
         this.fullUrl = fullUrl;
         this.shortUrl = shortUrl;
+        this.uuid = uuid;
     }
 
     public String getFullUrl()
@@ -33,5 +35,15 @@ public class ApiResponse
     public void setShortUrl(final String shortUrl)
     {
         this.shortUrl = shortUrl;
+    }
+
+    public String getUuid()
+    {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid)
+    {
+        this.uuid = uuid;
     }
 }

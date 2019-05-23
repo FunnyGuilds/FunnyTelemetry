@@ -108,3 +108,8 @@ code {
 .hidden {
     display: none;
 }
+
+.dropdown-toggle::after {
+    display: none;
+    overflow: hidden;
+}

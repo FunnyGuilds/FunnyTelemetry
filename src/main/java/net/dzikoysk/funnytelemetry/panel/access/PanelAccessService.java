@@ -3,8 +3,6 @@ package net.dzikoysk.funnytelemetry.panel.access;
 import java.util.Collection;
 import java.util.Map;
 
-import net.dzikoysk.funnytelemetry.panel.AccessLevel;
-
 public interface PanelAccessService
 {
     void setAccessForUser(String user, AccessLevel AccessLevel);

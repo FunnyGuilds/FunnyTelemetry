@@ -6,7 +6,7 @@
         <th:block th:replace="template/libraries :: head"/>
     </head>
     <body>
-        <!--/*@thymesVar id="shortLinkService" type="net.dzikoysk.funnytelemetry.shortlink.ShortLinkService"*/-->
+        <!--/*@thymesVar id="pasteShortLinkService" type="net.dzikoysk.funnytelemetry.shortlink.ShortLinkService"*/-->
         <!--/*@thymesVar id="paste" type="net.dzikoysk.funnytelemetry.funnybin.Paste"*/-->
         <!--/*@thymesVar id="error" type="boolean"*/-->
         <!--/*@thymesVar id="justHidden" type="boolean"*/-->
@@ -22,9 +22,12 @@
                         <a th:href="@{/panel/}">FunnyTelemetry</a>
                     </li>
                     <li class="breadcrumb-item">
-                        <a th:href="@{/panel/funnybin/pastes}">FunnyBin</a>
+                        <a th:href="@{/panel/funnybin/}">FunnyBin</a>
                     </li>
-                    <li th:if="${paste.hide}" class="breadcrumb-item">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/pastes}">Pastes</a>
+                    </li>
+                    <li th:if="!${error} and ${paste.hide}" class="breadcrumb-item">
                         <a th:href="@{/panel/funnybin/pastes/hidden}">Hidden entries</a>
                     </li>
                     <li class="breadcrumb-item active">Paste: <span th:text="${error} ? 'unknown' : ${paste.uniqueId}"/></li>
@@ -42,16 +45,37 @@
                     Paste hidden succesfully. <a href="javascript:window.history.back()">Go back</a>
                 </div>
 
-                <div th:if="!${error}">
+                <th:block th:if="!${error}">
+                    <div class="card mb-3" th:if="!${paste.pasteBundles.isEmpty()}">
+                        <div class="card-header">
+                            <i class="fas fa-file-archive"></i>
+                            &nbsp;Bundle
+                        </div>
+                        <div class="card-body">
+                            This paste is a part of following bundles:
+                            <ul>
+                                <li th:each="bundle : ${paste.pasteBundles}">
+                                    <a th:href="@{/panel/funnybin/bundle/{id}(id=${bundle.uniqueId})}" th:text="${bundle.uniqueId}" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <div class="card mb-3">
                         <div class="card-header">
-                            <i class="fas fa-paste"></i> Paste content (<a th:href="@{/panel/funnybin/paste/{id}/raw(id=${paste.uniqueId})}">See raw</a>)
+                            <i class="fas fa-paste"></i>
+                            &nbsp;Paste content
+                            (<a th:href="@{/panel/funnybin/paste/{id}/raw(id=${paste.uniqueId})}">See raw</a>)
+                            (<a th:href="${pasteShortLinkService.getShortLink(paste.shortLink)}">Short link</a>)
 
                             <th:block th:if="!${paste.hide}">
                                 <span sec:authorize="hasRole('ADMIN')">
                                     (<a data-confirmation="Are you sure you want to hide this paste? (This cannot be undone)" class="confirmation-link" th:href="@{/panel/funnybin/paste/{id}/hide(id=${paste.uniqueId})}">Hide this paste.</a>)
                                 </span>
                             </th:block>
+
+                            <span th:text="${paste.pasteType.name}" class="badge badge-success"/>
+                            <span th:text="${paste.tag}" class="badge badge-primary"/>
                         </div>
                         <div class="card-body">
                             <code th:text="${paste.content}"/>
@@ -61,7 +85,7 @@
                             <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${paste.submitter}" data-hidden="1">Hidden (click to show)</a>
                         </div>
                     </div>
-                </div>
+                </th:block>
             </div>
         </div>
 

@@ -6,7 +6,7 @@
         <th:block th:replace="template/libraries :: head"/>
     </head>
     <body>
-        <!--/*@thymesVar id="shortLinkService" type="net.dzikoysk.funnytelemetry.shortlink.ShortLinkService"*/-->
+        <!--/*@thymesVar id="pasteShortLinkService" type="net.dzikoysk.funnytelemetry.shortlink.ShortLinkService"*/-->
         <!--/*@thymesVar id="page" type="org.springframework.data.domain.Page<net.dzikoysk.funnytelemetry.funnybin.Paste>"*/-->
         <!--/*@thymesVar id="hidden" type="boolean"*/-->
 
@@ -21,14 +21,18 @@
                         <a th:href="@{/panel/}">FunnyTelemetry</a>
                     </li>
 
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/}">FunnyBin</a>
+                    </li>
+
                     <th:block th:if="!${hidden}">
-                        <li class="breadcrumb-item active">FunnyBin</li>
+                        <li class="breadcrumb-item active">Pastes</li>
 
                         <span sec:authorize="hasRole('ADMIN')">&nbsp;(Currently omitting hidden entries, click <a th:href="@{/panel/funnybin/pastes/hidden}">here</a> to show them)</span>
                     </th:block>
 
                     <li th:if="${hidden}" class="breadcrumb-item">
-                        <a th:href="@{/panel/funnybin/pastes}">FunnyBin</a>
+                        <a th:href="@{/panel/funnybin/pastes}">Pastes</a>
                     </li>
 
                     <li th:if="${hidden}" class="breadcrumb-item active">
@@ -40,10 +44,12 @@
                     <thead class="thead-dark">
                         <tr>
                             <th style="width: 10%;" scope="col">Id</th>
-                            <th style="width: 30%;" scope="col">UUID</th>
-                            <th style="width: 20%;" scope="col">Short link</th>
+                            <th style="width: 20%;" scope="col">UUID</th>
+                            <th style="width: 15%;" scope="col">Short link</th>
                             <th style="width: 15%;" scope="col">Submit date</th>
-                            <th style="width: 20%;" scope="col">Submitter IP</th>
+                            <th style="width: 10%;" scope="col">Type</th>
+                            <th style="width: 10%;" scope="col">Tag</th>
+                            <th style="width: 15%;" scope="col">Submitter IP</th>
                             <th sec:authorize="hasRole('ADMIN')" style="width: 5%;" scope="col">Hide</th>
                         </tr>
                     </thead>
@@ -57,9 +63,12 @@
                                 <span th:if="${element.hide}" class="hidden-paste">Hidden</span>
                             </td>
                             <td>
-                                <a th:href="${shortLinkService.getShortLink(element.shortLink)}" th:text="${shortLinkService.getShortLink(element.shortLink)}"/>
+                                <a th:href="${pasteShortLinkService.getShortLink(element.shortLink)}" th:text="${pasteShortLinkService.getShortLink(element.shortLink)}"/>
                             </td>
                             <td th:text="${#dates.format(element.submitDate, 'dd-MM-yyyy HH:mm:ss')}"/>
+                            <td th:text="${element.pasteType.name}"/>
+                            <td>
+                            </td>
                             <td>
                                 <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${element.submitter}" data-hidden="1">Hidden (click to show)</a>
                             </td>

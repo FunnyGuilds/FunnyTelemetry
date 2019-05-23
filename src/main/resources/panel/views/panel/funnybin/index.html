@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>FunnyTelemetry - Logs</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+
+                    <li class="breadcrumb-item active">FunnyBin</li>
+                </ol>
+
+                <h1>Sub-pages:</h1>
+                <ul>
+                    <li><a th:href="@{/panel/funnybin/bundles/}">Bundle list</a></li>
+                    <li><a th:href="@{/panel/funnybin/pastes/}">Paste list</a></li>
+
+                    <th:block>
+                        <li><a th:href="@{/panel/funnybin/pastes/hidden}">Pastes list (including hidden)</a></li>
+                        <li><a th:href="@{/panel/funnybin/bundles/hidden}">Bundle list (including hidden)</a></li>
+                    </th:block>
+                </ul>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

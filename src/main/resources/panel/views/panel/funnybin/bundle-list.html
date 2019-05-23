@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <title>FunnyTelemetry - FunnyBin - Paste list</title>
+
+        <th:block th:replace="template/libraries :: head"/>
+    </head>
+    <body>
+        <!--/*@thymesVar id="bundleShortLinkService" type="net.dzikoysk.funnytelemetry.shortlink.ShortLinkService"*/-->
+        <!--/*@thymesVar id="page" type="org.springframework.data.domain.Page<net.dzikoysk.funnytelemetry.funnybin.PasteBundle>"*/-->
+        <!--/*@thymesVar id="hidden" type="boolean"*/-->
+
+        <nav th:replace="panel/template :: navigation"/>
+
+        <div class="wrapper">
+            <ul th:replace="panel/template :: sidebar"/>
+
+            <div class="container-fluid">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/}">FunnyTelemetry</a>
+                    </li>
+
+                    <li class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/}">FunnyBin</a>
+                    </li>
+
+                    <th:block th:if="!${hidden}">
+                        <li class="breadcrumb-item active">Bundles</li>
+
+                        <span sec:authorize="hasRole('ADMIN')">&nbsp;(Currently omitting hidden entries, click <a th:href="@{/panel/funnybin/bundles/hidden}">here</a> to show them)</span>
+                    </th:block>
+
+                    <li th:if="${hidden}" class="breadcrumb-item">
+                        <a th:href="@{/panel/funnybin/bundles}">Bundles</a>
+                    </li>
+
+                    <li th:if="${hidden}" class="breadcrumb-item active">
+                        Hidden entries
+                    </li>
+                </ol>
+
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th style="width: 10%;" scope="col">Id</th>
+                            <th style="width: 25%;" scope="col">UUID</th>
+                            <th style="width: 15%;" scope="col">Short link</th>
+                            <th style="width: 15%;" scope="col">Submit date</th>
+                            <th style="width: 15%;" scope="col">Amount of pastes</th>
+                            <th style="width: 15%;" scope="col">Submitter IP</th>
+                            <th sec:authorize="hasRole('ADMIN')" style="width: 5%;" scope="col">Hide</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!--/*@thymesVar id="element" type="net.dzikoysk.funnytelemetry.funnybin.PasteBundle"*/-->
+                        <tr class="table-effects" th:each="element : ${page.getContent()}" th:classappend="${element.hide} ? 'table-danger'">
+                            <th scope="row" th:text="'#' + ${element.id}"/>
+
+                            <td>
+                                <a th:href="@{/panel/funnybin/bundle/{id}(id=${element.uniqueId})}" th:text="${element.uniqueId}"/>
+                                <span th:if="${element.hide}" class="hidden-paste">Hidden</span>
+                            </td>
+
+                            <td>
+                                <a th:href="${bundleShortLinkService.getShortLink(element.shortLink)}" th:text="${bundleShortLinkService.getShortLink(element.shortLink)}"/>
+                            </td>
+
+                            <td th:text="${#dates.format(element.submitDate, 'dd-MM-yyyy HH:mm:ss')}"/>
+                            <td th:text="${element.pastes.size()}"/>
+                            <td>
+                                <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${element.submitter}" data-hidden="1">Hidden (click to show)</a>
+                            </td>
+                            <td sec:authorize="hasRole('ADMIN')">
+                                <a class="confirmation-link" data-confirmation="Are you sure you want to hide this paste? (This cannot be undone)" th:href="@{/panel/funnybin/bundle/{id}/hide(id=${element.uniqueId})}">
+                                    <button data-confirmation="Are you sure you want to hide this paste? (This cannot be undone)" class="btn btn-danger">
+                                        Hide
+                                    </button>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <nav th:replace="panel/template :: pagination(page=${page}, filter='none')"/>
+            </div>
+        </div>
+
+        <th:block th:replace="template/libraries :: body"/>
+    </body>
+</html>

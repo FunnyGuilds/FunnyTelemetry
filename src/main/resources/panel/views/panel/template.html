@@ -26,7 +26,7 @@
             </ul>
         </nav>
 
-        <ul th:fragment="sidebar" class="sidebar navbar-nav">
+        <ul th:fragment="sidebar" class="sidebar navbar-nav toggled">
             <li class="nav-item">
                 <a class="nav-link" th:href="@{/panel/}" th:classappend="${tab == 'dashboard'} ? 'active'">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -34,10 +34,21 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" th:href="@{/panel/funnybin/pastes/}" th:classappend="${tab == 'funnybin'} ? 'active'">
+                <a class="nav-link dropdown-toggle" href="#" id="funnybinDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:classappend="${tab == 'funnybin'} ? 'active'">
                     <i class="fas fa-fw fa-paste"></i>
                     <span>FunnyBin</span>
                 </a>
+                <div class="dropdown-menu" aria-labelledby="funnybinDropdown">
+                    <h3 class="dropdown-header">Funnybin:</h3>
+
+                    <a class="dropdown-item" th:href="@{/panel/funnybin/bundles/}">Bundle list</a>
+                    <a class="dropdown-item" th:href="@{/panel/funnybin/pastes/}">Paste list</a>
+
+                    <th:block>
+                        <a class="dropdown-item" th:href="@{/panel/funnybin/pastes/hidden}">Pastes list (including hidden)</a>
+                        <a class="dropdown-item" th:href="@{/panel/funnybin/bundles/hidden}">Bundle list (including hidden)</a>
+                    </th:block>
+                </div>
             </li>
             <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                 <a class="nav-link" th:href="@{/panel/logs/}" th:classappend="${tab == 'logs'} ? 'active'">

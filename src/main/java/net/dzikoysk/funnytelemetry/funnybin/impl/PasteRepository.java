@@ -1,5 +1,6 @@
 package net.dzikoysk.funnytelemetry.funnybin.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,9 +12,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PasteRepository extends JpaRepository<Paste, Integer>
 {
-    @Override
-    List<Paste> findAll();
-
     Optional<Paste> findByUniqueId(UUID uniqueId);
 
     Optional<Paste> findByShortLink(String shortLink);
@@ -22,6 +20,6 @@ public interface PasteRepository extends JpaRepository<Paste, Integer>
 
     Page<Paste> findAllByOrderBySubmitDateDescIdDesc(Pageable pageable);
 
-    @Override
-    void delete(Paste paste);
+    List<Paste> findAllBySubmitterAndSubmitDateAfter(String submitter, Date date);
+
 }
