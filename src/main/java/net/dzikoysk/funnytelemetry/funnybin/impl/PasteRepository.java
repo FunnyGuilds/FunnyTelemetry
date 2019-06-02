@@ -22,4 +22,5 @@ public interface PasteRepository extends JpaRepository<Paste, Integer>
 
     List<Paste> findAllBySubmitterAndSubmitDateAfter(String submitter, Date date);
 
+    long countBySubmitDateBetween(Date start, Date end);
 }

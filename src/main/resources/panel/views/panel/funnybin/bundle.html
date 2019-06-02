@@ -62,11 +62,10 @@
                             <ul>
                                 <li th:each="paste : ${bundle.pastes}">
                                     <th:block th:if="${paste.hide}">
-                                        <a sec:authorize="hasRole('ADMIN')" th:href="@{/panel/funnybin/paste/{id}(id=${paste.uniqueId})}" th:text="${paste.uniqueId}" />
                                         <b>Hidden paste</b>
                                     </th:block>
 
-                                    <th:block th:if="!${paste.hide}">
+                                    <th:block th:if="!${paste.hide} or ${#authorization.expr('hasRole(''ADMIN'')')}">
                                         <a th:href="@{/panel/funnybin/paste/{id}(id=${paste.uniqueId})}" th:text="${paste.uniqueId}" />
 
                                         <span th:text="${paste.pasteType.name}" class="badge badge-success"/>

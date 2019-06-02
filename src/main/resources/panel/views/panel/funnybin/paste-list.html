@@ -68,6 +68,7 @@
                             <td th:text="${#dates.format(element.submitDate, 'dd-MM-yyyy HH:mm:ss')}"/>
                             <td th:text="${element.pasteType.name}"/>
                             <td>
+                                <span th:text="${element.tag}" class="badge badge-primary"/>
                             </td>
                             <td>
                                 <a href="javascript:void(0)" class="hidden-ip" data-th-attr="data-ip=${element.submitter}" data-hidden="1">Hidden (click to show)</a>

@@ -21,4 +21,6 @@ public interface PasteBundleRepository extends JpaRepository<PasteBundle, Intege
     Page<PasteBundle> findAllByOrderBySubmitDateDescIdDesc(Pageable pageable);
 
     List<PasteBundle> findAllBySubmitterAndSubmitDateAfter(String submitter, Date date);
+
+    long countBySubmitDateBetween(Date start, Date end);
 }

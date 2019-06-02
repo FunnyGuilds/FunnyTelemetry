@@ -4,7 +4,7 @@
         <!--/*@thymesVar id="tab" type="java.lang.String"*/-->
 
         <nav th:fragment="navigation" class="navbar navbar-expand navbar-dark bg-dark static-top">
-            <a class="navbar-brand mr-1" href="index.html">FunnyTelemetry Panel</a>
+            <a class="navbar-brand mr-1" th:href="@{/panel/}">FunnyTelemetry Panel</a>
 
             <div class="ml-auto"></div>
 
@@ -34,7 +34,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link dropdown-toggle" href="#" id="funnybinDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:classappend="${tab == 'funnybin'} ? 'active'">
+                <a class="nav-link dropdown-toggle hide-dropdown-toggle" href="#" id="funnybinDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" th:classappend="${tab == 'funnybin'} ? 'active'">
                     <i class="fas fa-fw fa-paste"></i>
                     <span>FunnyBin</span>
                 </a>

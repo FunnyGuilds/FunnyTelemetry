@@ -71,7 +71,7 @@ public class LogServiceImpl implements LogService
             .stream()
             .filter(resolver -> resolver.canResolve(actionType))
             .findFirst()
-            .map(resolver ->resolver.resolve(details))
+            .map(resolver -> resolver.resolve(details))
             .orElse("No details");
     }
 }

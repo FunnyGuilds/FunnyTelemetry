@@ -6,6 +6,8 @@
         <th:block th:replace="template/libraries :: head"/>
     </head>
     <body>
+        <!--/*@thymesVar id="stats" type="net.dzikoysk.funnytelemetry.panel.stats.Stats"*/-->
+
         <nav th:replace="panel/template :: navigation"/>
 
         <div class="wrapper">
@@ -18,30 +20,125 @@
                     </li>
                     <li class="breadcrumb-item active">Dashboard</li>
                 </ol>
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <i class="fas fa-chart-area"></i>
-                        No siema to jest jakas karta
+                <div class="row">
+                    <div class="col-sm col-sm-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="fas fa-user"></i>
+                                User information
+                            </div>
+                            <div class="card-body">
+                                <p>Your username: <span sec:authentication="name"/></p>
+                                <p>Your roles:</p>
+                                <ul>
+                                    <li sec:authorize="hasRole('ADMIN')">Admin</li>
+                                    <li sec:authorize="hasRole('USER')">User</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <i class="fas fa-info-circle"></i>
+                                General information
+                            </div>
+                            <div class="card-body">
+                                <p>Bundles submitted today: <span th:text="${stats.bundlesToday}"/></p>
+                                <p>Bundles submitted total: <span th:text="${stats.bundlesToday}"/></p>
+                                <p>Pastes submitted today: <span th:text="${stats.pastesToday}"/></p>
+                                <p>Pastes submitted total: <span th:text="${stats.pastesTotal}"/></p>
+                            </div>
+                            <div class="card-footer small text-muted">
+                                Last updated at <span th:text="${#dates.format(stats.date, 'hh:mm:ss a')}"/>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-
-                        <p>
-                            No siema, telemetria powstaje.
-                        </p>
-
-                        <p>
-                            Zalogowałeś się jako: <span sec:authentication="name"/> :0
-                        </p>
-
-                        <p>
-                            Tutaj będą wielkie rzeczy. Soon&trade;
-                        </p>
+                    <div class="col-sm col-sm-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-chart-area"></i>
+                                New submissions chart
+                            </div>
+                            <div class="card-body">
+                                <canvas id="chart-data"></canvas>
+                            </div>
+                            <div class="card-footer small text-muted">
+                                Last updated at <span th:text="${#dates.format(stats.date, 'hh:mm:ss a')}"/>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-footer small text-muted">Updated today at <th:block th:text="${#dates.format(#dates.createNow(), 'hh:mm a')}"/> </div>
                 </div>
             </div>
         </div>
 
         <th:block th:replace="template/libraries :: body"/>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            window.chartData = {};
+            window.chartData.pastes = [
+                /*[# th:each="stat : ${stats.pastesSubmitted}"]*/
+                /*[[${stat}]]*/,
+                /*[/]*/
+            ];
+            window.chartData.bundles = [
+                /*[# th:each="stat : ${stats.bundlesSubmitted}"]*/
+                /*[[${stat}]]*/,
+                /*[/]*/
+            ];
+            window.chartData.labels = [
+                /*[# th:each="label : ${stats.range.labels}"]*/
+                /*[[${label}]]*/,
+                /*[/]*/
+            ];
+            /*]]>*/
+        </script>
+
+        <script>
+            $(function () {
+                var config = {
+                    type: 'line',
+                    data: {
+                        labels: window.chartData.labels,
+                        datasets: [{
+                            label: 'Pastes',
+                            data: window.chartData.pastes,
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(0, 0, 0, 0)',
+                            fill: false,
+                            cubicInterpolationMode: 'monotone'
+                        }, {
+                            label: 'Bundles',
+                            data: window.chartData.bundles,
+                            borderColor: 'rgb(255, 159, 64)',
+                            backgroundColor: 'rgba(0, 0, 0, 0)',
+                            fill: false,
+                            cubicInterpolationMode: 'monotone'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        tooltips: {
+                            mode: 'index'
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    precision: 0,
+                                    min: 0
+                                }
+                            }]
+                        }
+                    }
+                };
+
+                new Chart(document.getElementById('chart-data').getContext('2d'), config);
+            });
+        </script>
     </body>
 </html>
