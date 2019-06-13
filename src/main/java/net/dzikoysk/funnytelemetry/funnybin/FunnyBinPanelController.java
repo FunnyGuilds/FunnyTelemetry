@@ -1,10 +1,10 @@
 package net.dzikoysk.funnytelemetry.funnybin;
 
-import java.security.Principal;
-import java.util.Optional;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+
+import java.security.Principal;
+import java.util.UUID;
 
 import net.dzikoysk.funnytelemetry.funnybin.exception.PasteNotFoundException;
 import net.dzikoysk.funnytelemetry.funnybin.shortlink.FunnyBinBundleShortLinkService;
@@ -69,16 +69,12 @@ public class FunnyBinPanelController
     @RequestMapping("/paste/{pasteId}")
     public String paste(final Model model, @PathVariable("pasteId") final String pasteId, final HttpServletRequest request)
     {
-        final Optional<Paste> paste = this.pasteService.findPaste(UUID.fromString(pasteId));
-
-        if (paste.isPresent() && (request.isUserInRole("ADMIN") || ! paste.get().isHide()))
-        {
-            model.addAttribute("paste", paste.get());
-        }
-        else
-        {
-            model.addAttribute("error", true);
-        }
+        this.pasteService.findPaste(UUID.fromString(pasteId))
+                .filter(paste -> request.isUserInRole("ADMIN") || ! paste.isHide())
+                .ifPresentOrElse(
+                        paste -> model.addAttribute("paste", paste),
+                        () -> model.addAttribute("error", true)
+                );
 
         return "panel/funnybin/paste";
     }
@@ -86,23 +82,19 @@ public class FunnyBinPanelController
     @RequestMapping("/paste/{pasteId}/hide")
     public String pasteHide(final Model model, @PathVariable("pasteId") final String pasteId, final HttpServletRequest request, final Principal principal)
     {
-        final Optional<Paste> paste = this.pasteService.findPaste(UUID.fromString(pasteId));
+        this.pasteService.findPaste(UUID.fromString(pasteId))
+                .ifPresentOrElse(paste -> {
+                            if ( !paste.isHide())
+                            {
+                                this.pasteService.hide(paste);
+                                this.logService.submitLog(ActionType.HID_PASTE, paste.getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
+                            }
 
-        if (paste.isPresent())
-        {
-            if (! paste.get().isHide())
-            {
-                this.pasteService.hide(paste.get());
-                this.logService.submitLog(ActionType.HID_PASTE, paste.get().getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
-            }
-
-            model.addAttribute("paste", paste.get());
-            model.addAttribute("justHidden", true);
-        }
-        else
-        {
-            model.addAttribute("error", true);
-        }
+                            model.addAttribute("paste", paste);
+                            model.addAttribute("justHidden", true);
+                        },
+                        () -> model.addAttribute("error", true)
+                );
 
         return "panel/funnybin/paste";
     }
@@ -111,14 +103,10 @@ public class FunnyBinPanelController
     @ResponseBody
     public String pasteRaw(@PathVariable("pasteId") final String pasteId, final HttpServletRequest request)
     {
-        final Optional<Paste> paste = this.pasteService.findPaste(UUID.fromString(pasteId));
-
-        if (paste.isEmpty() || (! request.isUserInRole("ADMIN") && paste.get().isHide()))
-        {
-            throw new PasteNotFoundException();
-        }
-
-        return paste.get().getContent();
+        return this.pasteService.findPaste(UUID.fromString(pasteId))
+                .filter(paste -> request.isUserInRole("ADMIN") || ! paste.isHide())
+                .orElseThrow(PasteNotFoundException::new)
+                .getContent();
     }
 
     @RequestMapping("/bundles")
@@ -133,7 +121,7 @@ public class FunnyBinPanelController
         return this.bundles(model, true, pageable);
     }
 
-    public String bundles(final Model model, final boolean hidden, final Pageable pageable)
+    private String bundles(final Model model, final boolean hidden, final Pageable pageable)
     {
         final Page<PasteBundle> page = hidden ? this.pasteService.getBundlesHidden(pageable) : this.pasteService.getBundles(pageable);
         model.addAttribute("page", page);
@@ -144,16 +132,12 @@ public class FunnyBinPanelController
     @RequestMapping("/bundle/{bundleId}")
     public String bundle(final Model model, @PathVariable("bundleId") final String bundleId, final HttpServletRequest request)
     {
-        final Optional<PasteBundle> bundle = this.pasteService.findBundle(UUID.fromString(bundleId));
-
-        if (bundle.isPresent() && (request.isUserInRole("ADMIN") || ! bundle.get().isHide()))
-        {
-            model.addAttribute("bundle", bundle.get());
-        }
-        else
-        {
-            model.addAttribute("error", true);
-        }
+        this.pasteService.findBundle(UUID.fromString(bundleId))
+                .filter(bundle -> request.isUserInRole("ADMIN") || ! bundle.isHide())
+                .ifPresentOrElse(
+                        bundle -> model.addAttribute("bundle", bundle),
+                        () -> model.addAttribute("error", true)
+                );
 
         return "panel/funnybin/bundle";
     }
@@ -162,31 +146,24 @@ public class FunnyBinPanelController
     @Transactional
     public String bundleHide(final Model model, @PathVariable("bundleId") final String bundleId, final HttpServletRequest request, final Principal principal)
     {
-        final Optional<PasteBundle> bundle = this.pasteService.findBundle(UUID.fromString(bundleId));
+        this.pasteService.findBundle(UUID.fromString(bundleId))
+                .ifPresentOrElse(bundle -> {
+                            bundle.getPastes()
+                                    .stream()
+                                    .filter(paste -> ! paste.isHide())
+                                    .forEach(paste -> this.logService.submitLog(
+                                            ActionType.HID_PASTE,
+                                            paste.getUniqueId().toString(),
+                                            principal.getName(), request.getRemoteAddr()
+                                    ));
 
-        if (bundle.isPresent())
-        {
-            if (! bundle.get().isHide())
-            {
-                for (final Paste paste : bundle.get().getPastes())
-                {
-                    if (! paste.isHide())
-                    {
-                        this.logService.submitLog(ActionType.HID_PASTE, paste.getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
-                    }
-                }
-                this.logService.submitLog(ActionType.HID_PASTE_BUNDLE, bundle.get().getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
-            }
+                            this.pasteService.hide(bundle);
 
-            this.pasteService.hide(bundle.get());
-
-            model.addAttribute("bundle", bundle.get());
-            model.addAttribute("justHidden", true);
-        }
-        else
-        {
-            model.addAttribute("error", true);
-        }
+                            model.addAttribute("bundle", bundle);
+                            model.addAttribute("justHidden", true);
+                        },
+                        () -> model.addAttribute("error", true)
+                );
 
         return "panel/funnybin/bundle";
     }

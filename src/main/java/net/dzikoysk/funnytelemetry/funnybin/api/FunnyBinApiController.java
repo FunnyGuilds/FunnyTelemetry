@@ -1,10 +1,10 @@
 package net.dzikoysk.funnytelemetry.funnybin.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import net.dzikoysk.funnytelemetry.ban.BanService;
 import net.dzikoysk.funnytelemetry.funnybin.Paste;
@@ -92,16 +92,12 @@ public class FunnyBinApiController
             throw new PasteInvalidRequest("Bundle must contain at least 2 pastes");
         }
 
-        final List<Paste> pasteList = new ArrayList<>(pastes.size());
-        for (final String paste : pastes)
-        {
-            final Optional<Paste> optional = this.pasteService.findPaste(UUID.fromString(paste));
-            if (optional.isEmpty() || optional.get().isHide())
-            {
-                throw new PasteNotFoundException("Paste with id: " + paste + " not found");
-            }
-            pasteList.add(optional.get());
-        }
+        final List<Paste> pasteList = pastes
+                .stream()
+                .map(pasteId -> this.pasteService.findPaste(UUID.fromString(pasteId))
+                        .filter(it -> !it.isHide())
+                        .orElseThrow(() -> new PasteNotFoundException("Paste with id: " + pasteId + " not found")))
+                .collect(Collectors.toList());
 
         this.rateLimitService.ensureNotRateLimited(request.getRemoteAddr());
         final PasteBundle bundle = this.pasteService.createBundle(pasteList, request.getRemoteAddr());
