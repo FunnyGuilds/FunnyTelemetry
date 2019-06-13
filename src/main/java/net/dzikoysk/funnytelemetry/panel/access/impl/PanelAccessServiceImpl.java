@@ -44,32 +44,29 @@ public class PanelAccessServiceImpl implements PanelAccessService
 
     private void setAccessFor(final String name, final String prefix, final AccessLevel panelAccess)
     {
-        if (! NAME_PATTERN.matcher(name).matches())
+        if (!NAME_PATTERN.matcher(name).matches())
         {
             throw new IllegalArgumentException("name is invalid");
         }
 
         this.panelAccessRepository.findByName(prefix + name)
-                .ifPresentOrElse(
-                        access -> {
-                            access.setAccessLevel(panelAccess);
+                .ifPresentOrElse(access -> {
+                    access.setAccessLevel(panelAccess);
 
-                            if (panelAccess == AccessLevel.NO_ACCESS)
-                            {
-                                this.panelAccessRepository.delete(access);
-                            }
-                            else
-                            {
-                                this.panelAccessRepository.save(access);
-                            }
-                        },
-                        () -> {
-                            if (panelAccess != AccessLevel.NO_ACCESS)
-                            {
-                                this.panelAccessRepository.save(new PanelAccess(UUID.randomUUID(), prefix + name, panelAccess));
-                            }
-                        }
-                );
+                    if (panelAccess == AccessLevel.NO_ACCESS)
+                    {
+                        this.panelAccessRepository.delete(access);
+                    }
+                    else
+                    {
+                        this.panelAccessRepository.save(access);
+                    }
+                }, () -> {
+                    if (panelAccess != AccessLevel.NO_ACCESS)
+                    {
+                        this.panelAccessRepository.save(new PanelAccess(UUID.randomUUID(), prefix + name, panelAccess));
+                    }
+                });
     }
 
     @Override
@@ -97,9 +94,12 @@ public class PanelAccessServiceImpl implements PanelAccessService
     @Override
     public AccessLevel getAccessForUserOrOrganizations(final String user, final Collection<String> organizations)
     {
-        final List<String> allIds = new ArrayList<>(organizations.size() + 1);
+        List<String> allIds = organizations.stream()
+                .map(organization -> "@" + organization)
+                .collect(Collectors.toList());
+
         allIds.add(user);
-        organizations.stream().map(organization -> "@" + organization).forEach(allIds::add);
+
         final List<PanelAccess> accessList = this.panelAccessRepository.findByNameIn(allIds);
 
         return accessList.stream().map(PanelAccess::getAccessLevel).max(Comparator.naturalOrder()).orElse(AccessLevel.NO_ACCESS);

@@ -83,9 +83,9 @@ public class FunnyBinPanelController
     public String pasteHide(final Model model, @PathVariable("pasteId") final String pasteId, final HttpServletRequest request, final Principal principal)
     {
         this.pasteService.findPaste(UUID.fromString(pasteId))
-                .ifPresentOrElse(
-                        paste -> {
-                            if (! paste.isHide()) {
+                .ifPresentOrElse(paste -> {
+                            if ( !paste.isHide())
+                            {
                                 this.pasteService.hide(paste);
                                 this.logService.submitLog(ActionType.HID_PASTE, paste.getUniqueId().toString(), principal.getName(), request.getRemoteAddr());
                             }
@@ -147,16 +147,15 @@ public class FunnyBinPanelController
     public String bundleHide(final Model model, @PathVariable("bundleId") final String bundleId, final HttpServletRequest request, final Principal principal)
     {
         this.pasteService.findBundle(UUID.fromString(bundleId))
-                .ifPresentOrElse(
-                        bundle -> {
+                .ifPresentOrElse(bundle -> {
                             bundle.getPastes()
                                     .stream()
                                     .filter(paste -> ! paste.isHide())
                                     .forEach(paste -> this.logService.submitLog(
                                             ActionType.HID_PASTE,
                                             paste.getUniqueId().toString(),
-                                            principal.getName(), request.getRemoteAddr())
-                                    );
+                                            principal.getName(), request.getRemoteAddr()
+                                    ));
 
                             this.pasteService.hide(bundle);
 
