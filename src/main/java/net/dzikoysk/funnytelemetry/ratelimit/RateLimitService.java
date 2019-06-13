@@ -6,7 +6,7 @@ public interface RateLimitService
 
     void bumpRateLimit(String address);
 
-    void ensureNotRateLimited(String addresss);
+    void ensureNotRateLimited(String address);
 
     void removeChanges(String address);
 

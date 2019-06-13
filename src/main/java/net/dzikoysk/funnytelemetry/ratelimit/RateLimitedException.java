@@ -4,24 +4,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
-public class RateLimittedException extends RuntimeException
+public class RateLimitedException extends RuntimeException
 {
-    public RateLimittedException()
+    public RateLimitedException()
     {
         super();
     }
 
-    public RateLimittedException(final String message)
+    public RateLimitedException(final String message)
     {
         super(message);
     }
 
-    public RateLimittedException(final String message, final Throwable cause)
+    public RateLimitedException(final String message, final Throwable cause)
     {
         super(message, cause);
     }
 
-    public RateLimittedException(final Throwable cause)
+    public RateLimitedException(final Throwable cause)
     {
         super(cause);
     }
