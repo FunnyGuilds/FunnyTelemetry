@@ -1,15 +1,15 @@
 package net.dzikoysk.funnytelemetry.panel.access.impl;
 
+import javax.transaction.Transactional;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 
 import net.dzikoysk.funnytelemetry.panel.access.AccessLevel;
 import net.dzikoysk.funnytelemetry.panel.access.PanelAccess;
@@ -49,31 +49,27 @@ public class PanelAccessServiceImpl implements PanelAccessService
             throw new IllegalArgumentException("name is invalid");
         }
 
-        final Optional<PanelAccess> foundAccess = this.panelAccessRepository.findByName(prefix + name);
+        this.panelAccessRepository.findByName(prefix + name)
+                .ifPresentOrElse(
+                        access -> {
+                            access.setAccessLevel(panelAccess);
 
-        if (foundAccess.isEmpty())
-        {
-            if (panelAccess == AccessLevel.NO_ACCESS)
-            {
-                return;
-            }
-
-            this.panelAccessRepository.save(new PanelAccess(UUID.randomUUID(), prefix + name, panelAccess));
-        }
-        else
-        {
-            final PanelAccess access = foundAccess.get();
-            access.setAccessLevel(panelAccess);
-
-            if (panelAccess == AccessLevel.NO_ACCESS)
-            {
-                this.panelAccessRepository.delete(access);
-            }
-            else
-            {
-                this.panelAccessRepository.save(access);
-            }
-        }
+                            if (panelAccess == AccessLevel.NO_ACCESS)
+                            {
+                                this.panelAccessRepository.delete(access);
+                            }
+                            else
+                            {
+                                this.panelAccessRepository.save(access);
+                            }
+                        },
+                        () -> {
+                            if (panelAccess != AccessLevel.NO_ACCESS)
+                            {
+                                this.panelAccessRepository.save(new PanelAccess(UUID.randomUUID(), prefix + name, panelAccess));
+                            }
+                        }
+                );
     }
 
     @Override
@@ -127,8 +123,8 @@ public class PanelAccessServiceImpl implements PanelAccessService
 
         return access
             .stream()
-            .filter(a -> a.getAccessLevel() != AccessLevel.NO_ACCESS)
-            .collect(Collectors.toMap(a -> organization ? a.getName().substring(1) : a.getName(), PanelAccess::getAccessLevel));
+            .filter(it -> it.getAccessLevel() != AccessLevel.NO_ACCESS)
+            .collect(Collectors.toMap(it -> organization ? it.getName().substring(1) : it.getName(), PanelAccess::getAccessLevel));
     }
 
     @Override
