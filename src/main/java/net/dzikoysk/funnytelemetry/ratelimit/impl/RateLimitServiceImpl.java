@@ -56,11 +56,11 @@ public class RateLimitServiceImpl implements RateLimitService
     }
 
     @Override
-    public void ensureNotRateLimited(final String addresss)
+    public void ensureNotRateLimited(final String address)
     {
-        this.bumpRateLimit(addresss);
+        this.bumpRateLimit(address);
 
-        if (! this.checkRateLimit(addresss))
+        if (! this.checkRateLimit(address))
         {
             throw new RateLimittedException();
         }
