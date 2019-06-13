@@ -10,7 +10,7 @@ import net.dzikoysk.funnytelemetry.ban.BanService;
 import net.dzikoysk.funnytelemetry.funnybin.PasteService;
 import net.dzikoysk.funnytelemetry.ratelimit.RateLimit;
 import net.dzikoysk.funnytelemetry.ratelimit.RateLimitService;
-import net.dzikoysk.funnytelemetry.ratelimit.RateLimittedException;
+import net.dzikoysk.funnytelemetry.ratelimit.RateLimitedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -56,13 +56,13 @@ public class RateLimitServiceImpl implements RateLimitService
     }
 
     @Override
-    public void ensureNotRateLimited(final String addresss)
+    public void ensureNotRateLimited(final String address)
     {
-        this.bumpRateLimit(addresss);
+        this.bumpRateLimit(address);
 
-        if (! this.checkRateLimit(addresss))
+        if (! this.checkRateLimit(address))
         {
-            throw new RateLimittedException();
+            throw new RateLimitedException();
         }
     }
 
